@@ -43,11 +43,11 @@ how this maps onto the FinOps Framework (Inform / Optimize / Operate).
 
 All code, scripts, and documentation in this repo were written by Black Box Infra team with Claude and other AI based tools. The following are the primary points of contact for this platform:
 
-Appllication Onwer  - Tom John Kokkadan (tom.kokkadan@blackbox.com)
+Appllication Onwer  - Tom John Kokkadan
 
-Platform point of Contact - Ankit Saraswat ( Ankit.Saraswat@BlackBox.com)
+Platform point of Contact - Ankit Saraswat
 
-Code review and Sanity checks performed by - Rahul Basu (rahul.basu@blackbox.com)
+Code review and Sanity checks performed by - Rahul Basu
 
 ## Azure services used
 
