@@ -1,0 +1,480 @@
+trigger:
+  - main
+
+parameters:
+  - name: runMode
+    type: string
+    default: Daily
+    values: [Baseline, Hourly, Daily, Weekly]
+  - name: tenantName
+    type: string
+    default: 'default'
+    displayName: 'Tenant Name'
+  - name: configPath
+    type: string
+    default: 'variables'
+    displayName: 'Configuration Path'
+  - name: webAppName
+    type: string
+    default: ''
+    displayName: 'Web App name (leave blank to use the name from tenant config)'
+
+# Daily by default, matching the "runMode: Daily" default above. Change the cron
+# expression (not runMode) if you want a different cadence — they are independent.
+# For Hourly/Weekly/Baseline runs, trigger the pipeline manually with that runMode
+# rather than adding more schedules here.
+schedules:
+  - cron: "0 2 * * *"
+    displayName: Daily Azure Adoption Collection
+    branches:
+      include: [main]
+    always: true
+
+pool:
+  vmImage: windows-latest
+
+variables:
+  # Service connection scoped to Reader + Cost Management Reader + Monitoring Reader
+  # ONLY across the tenant's subscriptions — this identity never needs write access.
+  azureServiceConnection: "sc-azure-adoption-wif"
+  # Separate connection used only for deploying build output (App Service). Keep this
+  # split from azureServiceConnection above so the read-only collection identity and
+  # the deploy identity are never the same principal.
+  azureContributorConnection: "sc-azure-adoption-writer"
+  tenantConfigPath: "$(Build.SourcesDirectory)/${{ parameters.configPath }}/environments/${{ parameters.tenantName }}"
+  buildConfiguration: 'Release'
+
+stages:
+  - stage: Validate
+    displayName: 'Validate Configuration'
+    jobs:
+      - job: ValidateConfig
+        displayName: 'Validate Tenant Configuration'
+        steps:
+          - checkout: self
+
+          - task: PowerShell@2
+            displayName: 'Check Configuration Files'
+            inputs:
+              targetType: 'inline'
+              script: |
+                $configPath = "$(tenantConfigPath)"
+                $sharedPath = "$(Build.SourcesDirectory)/${{ parameters.configPath }}/shared"
+
+                Write-Host "Validating configuration..."
+                Write-Host "Tenant: ${{ parameters.tenantName }}"
+                Write-Host "Config Path: $configPath"
+                Write-Host "Shared Path: $sharedPath"
+
+                $configFile = Join-Path $configPath "config.json"
+                if (-not (Test-Path $configFile)) {
+                  Write-Error "Tenant config not found: $configFile"
+                  exit 1
+                }
+
+                $serviceMappingFile = Join-Path $sharedPath "service-mapping.json"
+                if (-not (Test-Path $serviceMappingFile)) {
+                  Write-Error "Service mapping not found: $serviceMappingFile"
+                  exit 1
+                }
+
+                $metricMappingFile = Join-Path $sharedPath "metric-mapping.json"
+                if (-not (Test-Path $metricMappingFile)) {
+                  Write-Error "Metric mapping not found: $metricMappingFile"
+                  exit 1
+                }
+
+                Write-Host "Configuration validation successful"
+                Write-Host "##vso[task.setvariable variable=ConfigValid]true"
+
+          # This is the step that makes the tenant config file the single source of
+          # truth for every existing Azure service this pipeline touches. Every stage
+          # after this one reads these as stage outputs (see the `variables:` block
+          # each of them adds) — their VALUES come from your checked-in
+          # variables/environments/<tenant>/config.json, not from a separately
+          # maintained Azure DevOps variable group. Add a new tenant by adding a new
+          # config.json; nothing in Azure DevOps project settings needs to change.
+          - task: PowerShell@2
+            name: LoadConfig
+            displayName: 'Load Existing Azure Services from Tenant Config'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Import-Module "$(Build.SourcesDirectory)/scripts/ConfigHelper.psm1" -Force
+                $config = Import-TenantConfig -TenantName "${{ parameters.tenantName }}" -ConfigPath "${{ parameters.configPath }}"
+
+                # isOutput=true is what lets other STAGES read these (not just later
+                # steps in this same job) — see stageDependencies.Validate.LoadConfig.*
+                # in the Collect/LandAndIngest/ProvisionInfra/DeployToProduction stages.
+                function Set-PipelineVar($name, $value) {
+                  Write-Host "$name = $value"
+                  Write-Host "##vso[task.setvariable variable=$name;isOutput=true]$value"
+                }
+
+                Set-PipelineVar "AZURE_AD_TENANT_ID"     $config.tenantId
+                Set-PipelineVar "AZURE_AD_CLIENT_ID"     $config.webapp.clientId
+                Set-PipelineVar "ADX_CLUSTER_URL"        $config.adx.clusterUrl
+                Set-PipelineVar "ADX_CLUSTER_NAME"       $config.adx.clusterName
+                Set-PipelineVar "ADX_RESOURCE_GROUP"     $config.adx.resourceGroup
+                Set-PipelineVar "ADX_DATABASE"           $config.adx.database
+                Set-PipelineVar "STORAGE_ACCOUNT"        $config.storage.accountName
+                Set-PipelineVar "STORAGE_RESOURCE_GROUP" $config.storage.resourceGroup
+                Set-PipelineVar "WEBAPP_RESOURCE_GROUP"  $config.webapp.resourceGroup
+
+                # Explicit webAppName parameter always wins over the checked-in config,
+                # so you can stand up a second/parallel site for the same tenant without
+                # editing config.json.
+                $webAppNameResolved = if ("${{ parameters.webAppName }}" -ne "") { "${{ parameters.webAppName }}" } else { $config.webapp.name }
+                Set-PipelineVar "webAppNameResolved" $webAppNameResolved
+
+  - stage: Collect
+    displayName: 'Collect Azure Estate Data'
+    dependsOn: Validate
+    condition: succeeded()
+    jobs:
+      - job: CollectAndLand
+        displayName: 'Collect Resources, Metrics, Cost, and Activity'
+        steps:
+          - checkout: self
+
+          - task: AzurePowerShell@5
+            displayName: 'Collect and normalize into ADX-ready JSON'
+            inputs:
+              azureSubscription: "$(azureServiceConnection)"
+              ScriptType: FilePath
+              ScriptPath: "$(Build.SourcesDirectory)/scripts/Run-Dashboard-Assessment.ps1"
+              ScriptArguments: |
+                -Mode "${{ parameters.runMode }}" `
+                -Days 90 `
+                -ConfigPath "${{ parameters.configPath }}"
+              azurePowerShellVersion: LatestVersion
+              pwsh: true
+
+          # Budgets are a separate Azure resource (not derivable from Resource Graph or
+          # Cost Management usage data), so they're collected independently here and land
+          # in the same $(Build.SourcesDirectory)/output/adx folder the step above writes
+          # to — picked up by the same "Upload ADX-ready JSON to Storage" step in
+          # LandAndIngest below without any change needed there.
+          - task: AzurePowerShell@5
+            displayName: 'Collect cost budgets'
+            inputs:
+              azureSubscription: "$(azureServiceConnection)"
+              ScriptType: FilePath
+              ScriptPath: "$(Build.SourcesDirectory)/scripts/Collect-CostBudgets.ps1"
+              ScriptArguments: |
+                -TenantName "${{ parameters.tenantName }}" `
+                -ConfigPath "${{ parameters.configPath }}"
+              azurePowerShellVersion: LatestVersion
+              pwsh: true
+
+          # Resource Health has no Resource-Graph-style bulk query — this calls the
+          # health API once per resource, reading the inventory the step above already
+          # wrote, so it doesn't re-discover resources itself.
+          - task: AzurePowerShell@5
+            displayName: 'Collect resource health'
+            inputs:
+              azureSubscription: "$(azureServiceConnection)"
+              ScriptType: FilePath
+              ScriptPath: "$(Build.SourcesDirectory)/scripts/Collect-ResourceHealth.ps1"
+              ScriptArguments: |
+                -TenantName "${{ parameters.tenantName }}" `
+                -ConfigPath "${{ parameters.configPath }}"
+              azurePowerShellVersion: LatestVersion
+              pwsh: true
+
+          # Deployment history lives in Azure DevOps, not Azure Resource Manager — this
+          # uses the pipeline's own OAuth token rather than a separate credential. Requires
+          # "Allow scripts to access the OAuth token" enabled on this job, and
+          # devops.organization / devops.project set in the tenant config.
+          - task: AzurePowerShell@5
+            displayName: 'Collect deployment activity'
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+            inputs:
+              azureSubscription: "$(azureServiceConnection)"
+              ScriptType: FilePath
+              ScriptPath: "$(Build.SourcesDirectory)/scripts/Collect-DeploymentActivity.ps1"
+              ScriptArguments: |
+                -TenantName "${{ parameters.tenantName }}" `
+                -ConfigPath "${{ parameters.configPath }}" `
+                -OAuthToken "$(System.AccessToken)"
+              azurePowerShellVersion: LatestVersion
+              pwsh: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Collection Results'
+            condition: always()
+            inputs:
+              targetPath: "$(Build.SourcesDirectory)/output"
+              artifact: "collection-${{ parameters.tenantName }}-${{ parameters.runMode }}"
+
+  - stage: LandAndIngest
+    displayName: 'Land to Storage and Ingest into ADX'
+    dependsOn: [Collect, Validate]
+    condition: succeeded()
+    variables:
+      ADX_CLUSTER_NAME: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.ADX_CLUSTER_NAME'] ]
+      ADX_RESOURCE_GROUP: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.ADX_RESOURCE_GROUP'] ]
+      ADX_DATABASE: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.ADX_DATABASE'] ]
+    jobs:
+      - job: UploadAndIngest
+        displayName: 'Upload JSON to ADLS and queue ADX ingestion'
+        steps:
+          - checkout: self
+
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Collection Artifact'
+            inputs:
+              artifactName: "collection-${{ parameters.tenantName }}-${{ parameters.runMode }}"
+              targetPath: "$(Build.SourcesDirectory)/output"
+
+          - task: AzurePowerShell@5
+            displayName: 'Upload ADX-ready JSON to Storage'
+            inputs:
+              azureSubscription: "$(azureServiceConnection)"
+              ScriptType: FilePath
+              ScriptPath: "$(Build.SourcesDirectory)/scripts/Upload-Json-ToStorage.ps1"
+              ScriptArguments: |
+                -SourceFolder "$(Build.SourcesDirectory)/output/adx" `
+                -TenantName "${{ parameters.tenantName }}" `
+                -ConfigPath "${{ parameters.configPath }}"
+              azurePowerShellVersion: LatestVersion
+              pwsh: true
+
+          # NOTE: this queues ingestion via the ADX ingest command, which requires
+          # the ADX cluster, database, and tables (adx/schema.csl) to already exist,
+          # and requires an Az.Kusto-capable identity on azureServiceConnection.
+          # If your ADX cluster/database aren't provisioned yet, this step will fail —
+          # see GAP-ANALYSIS.md for the remaining ADX provisioning work.
+          - task: AzurePowerShell@5
+            displayName: 'Ingest JSON into ADX'
+            inputs:
+              azureSubscription: "$(azureServiceConnection)"
+              ScriptType: InlineScript
+              Inline: |
+                Import-Module Az.Kusto -ErrorAction Stop
+                $cluster = "$(ADX_CLUSTER_NAME)"
+                $rg = "$(ADX_RESOURCE_GROUP)"
+                $db = "$(ADX_DATABASE)"
+                $mappings = @{
+                  'adx-resource-inventory.json'   = 'ResourceInventory'
+                  'adx-cost-fact.json'            = 'CostAnalysisFact'
+                  'adx-recommendations.json'      = 'FinOpsOptimizationFact'
+                  'adx-cost-budget.json'          = 'CostBudgetFact'
+                  'adx-resource-usage.json'       = 'ResourceUsageFact'
+                  'adx-activity.json'             = 'AzureActivityFact'
+                  'adx-governance.json'           = 'FinOpsGovernanceFact'
+                  'adx-resource-health.json'      = 'ResourceHealthFact'
+                  'adx-deployment-activity.json'  = 'DeploymentActivityFact'
+                  'adx-collector-health.json'     = 'CollectorHealth'
+                }
+                foreach ($entry in $mappings.GetEnumerator()) {
+                  $blobPath = "raw/${{ parameters.runMode }}/$($entry.Key)"
+                  Write-Host "Queueing ingestion: $blobPath -> $($entry.Value)"
+                  # Invoke-AzKustoDatabasePrincipalAssignment / queued ingestion via
+                  # Az.Kusto or the Kusto ingest client library goes here. Left as an
+                  # explicit TODO rather than a fabricated call — see GAP-ANALYSIS.md.
+                }
+              azurePowerShellVersion: LatestVersion
+              pwsh: true
+
+  - stage: EnrichFinOps
+    displayName: 'Derive Orphan Detection, Forecast, and Anomalies'
+    dependsOn: [LandAndIngest, Validate]
+    condition: succeeded()
+    variables:
+      ADX_CLUSTER_URL: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.ADX_CLUSTER_URL'] ]
+      ADX_DATABASE: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.ADX_DATABASE'] ]
+    jobs:
+      - job: DeriveFacts
+        displayName: 'Run orphan/forecast/anomaly rules against ADX'
+        steps:
+          - checkout: self
+
+          # These three all query tables that must already be populated in ADX
+          # (ResourceInventory, CostAnalysisFact) — which depends on the "Ingest JSON
+          # into ADX" step in LandAndIngest actually being implemented, not just the
+          # stub it is today. See GAP-ANALYSIS.md. Once that's filled in, these three
+          # steps work as-is with no further change.
+          - task: AzurePowerShell@5
+            displayName: 'Run orphan detection'
+            inputs:
+              azureSubscription: "$(azureServiceConnection)"
+              ScriptType: FilePath
+              ScriptPath: "$(Build.SourcesDirectory)/scripts/Invoke-OrphanDetection.ps1"
+              ScriptArguments: |
+                -TenantName "${{ parameters.tenantName }}" `
+                -ConfigPath "${{ parameters.configPath }}"
+              azurePowerShellVersion: LatestVersion
+              pwsh: true
+
+          - task: AzurePowerShell@5
+            displayName: 'Run cost forecast'
+            inputs:
+              azureSubscription: "$(azureServiceConnection)"
+              ScriptType: FilePath
+              ScriptPath: "$(Build.SourcesDirectory)/scripts/Collect-CostForecast.ps1"
+              ScriptArguments: |
+                -TenantName "${{ parameters.tenantName }}" `
+                -ConfigPath "${{ parameters.configPath }}"
+              azurePowerShellVersion: LatestVersion
+              pwsh: true
+
+          - task: AzurePowerShell@5
+            displayName: 'Run cost anomaly detection'
+            inputs:
+              azureSubscription: "$(azureServiceConnection)"
+              ScriptType: FilePath
+              ScriptPath: "$(Build.SourcesDirectory)/scripts/Detect-CostAnomalies.ps1"
+              ScriptArguments: |
+                -TenantName "${{ parameters.tenantName }}" `
+                -ConfigPath "${{ parameters.configPath }}"
+              azurePowerShellVersion: LatestVersion
+              pwsh: true
+
+  - stage: ProvisionInfra
+    displayName: 'Provision Web App Infrastructure'
+    dependsOn: Validate
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+    variables:
+      ADX_CLUSTER_URL: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.ADX_CLUSTER_URL'] ]
+      ADX_DATABASE: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.ADX_DATABASE'] ]
+      AZURE_AD_TENANT_ID: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.AZURE_AD_TENANT_ID'] ]
+      AZURE_AD_CLIENT_ID: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.AZURE_AD_CLIENT_ID'] ]
+      WEBAPP_RESOURCE_GROUP: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.WEBAPP_RESOURCE_GROUP'] ]
+      webAppNameResolved: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.webAppNameResolved'] ]
+    jobs:
+      - job: DeployBicep
+        displayName: 'Deploy App Service (webapp/infra/appservice.bicep)'
+        steps:
+          - checkout: self
+
+          # This is the step that was missing: appservice.bicep existed in the repo
+          # but nothing ever actually ran it, so $(webAppNameResolved) was only ever
+          # a name the deploy step assumed already existed. This creates/updates it.
+          # The site's URL is https://$(webAppNameResolved).azurewebsites.net —
+          # printed at the end of this step, and also available as a pipeline
+          # artifact output for downstream stages (e.g. CORS, docs, notifications).
+          - task: AzureCLI@2
+            displayName: 'Deploy appservice.bicep'
+            inputs:
+              azureSubscription: '$(azureContributorConnection)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az deployment group create \
+                  --resource-group "$(WEBAPP_RESOURCE_GROUP)" \
+                  --template-file "$(Build.SourcesDirectory)/webapp/infra/appservice.bicep" \
+                  --parameters \
+                    appName="$(webAppNameResolved)" \
+                    adxClusterUrl="$(ADX_CLUSTER_URL)" \
+                    adxDatabase="$(ADX_DATABASE)" \
+                    tenantId="$(AZURE_AD_TENANT_ID)" \
+                    clientId="$(AZURE_AD_CLIENT_ID)" \
+                    corsOrigins="['https://$(webAppNameResolved).azurewebsites.net']"
+
+                echo "Site URL: https://$(webAppNameResolved).azurewebsites.net"
+                echo "##vso[task.setvariable variable=siteUrl;isOutput=true]https://$(webAppNameResolved).azurewebsites.net"
+            name: DeployBicepStep
+
+  - stage: BuildWebApp
+    displayName: 'Build Web Application'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+    jobs:
+      - job: BuildAPI
+        displayName: 'Build .NET Backend API'
+        steps:
+          - checkout: self
+
+          - task: UseDotNet@2
+            displayName: 'Setup .NET 8'
+            inputs:
+              version: '8.x'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Restore NuGet Packages'
+            inputs:
+              command: 'restore'
+              projects: '**/webapp/backend/**/*.csproj'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Build Application'
+            inputs:
+              command: 'build'
+              projects: '**/webapp/backend/**/*.csproj'
+              arguments: '--no-restore --configuration $(buildConfiguration)'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Publish Application'
+            inputs:
+              command: 'publish'
+              projects: '**/webapp/backend/**/*.csproj'
+              arguments: '--no-restore --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Build Artifact'
+            inputs:
+              targetPath: "$(Build.ArtifactStagingDirectory)"
+              artifact: "webapp-build-$(Build.BuildId)"
+
+  - stage: DeployToProduction
+    displayName: 'Deploy to Production'
+    condition: and(eq(variables['Build.SourceBranch'], 'refs/heads/main'), succeeded())
+    dependsOn: [LandAndIngest, BuildWebApp, ProvisionInfra, Validate]
+    variables:
+      ADX_CLUSTER_URL: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.ADX_CLUSTER_URL'] ]
+      ADX_DATABASE: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.ADX_DATABASE'] ]
+      AZURE_AD_TENANT_ID: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.AZURE_AD_TENANT_ID'] ]
+      AZURE_AD_CLIENT_ID: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.AZURE_AD_CLIENT_ID'] ]
+      WEBAPP_RESOURCE_GROUP: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.WEBAPP_RESOURCE_GROUP'] ]
+      webAppNameResolved: $[ stageDependencies.Validate.ValidateConfig.outputs['LoadConfig.webAppNameResolved'] ]
+    jobs:
+      - deployment: DeployWebApp
+        displayName: 'Deploy Web Application'
+        environment: 'Production-${{ parameters.tenantName }}'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: DownloadPipelineArtifact@2
+                  displayName: 'Download Build Artifact'
+                  inputs:
+                    artifactName: "webapp-build-$(Build.BuildId)"
+                    targetPath: "$(Pipeline.Workspace)/webapp"
+
+                - task: AzureWebApp@1
+                  displayName: 'Deploy to App Service'
+                  inputs:
+                    azureSubscription: "$(azureContributorConnection)"
+                    appType: 'webAppLinux'
+                    appName: '$(webAppNameResolved)'
+                    package: "$(Pipeline.Workspace)/webapp"
+                    runtimeStack: 'DOTNETCORE|8.0'
+
+                - task: AzureAppServiceSettings@1
+                  displayName: 'Configure App Settings'
+                  inputs:
+                    azureSubscription: "$(azureContributorConnection)"
+                    appName: '$(webAppNameResolved)'
+                    resourceGroupName: '$(WEBAPP_RESOURCE_GROUP)'
+                    appSettings: |
+                      [
+                        {
+                          "name": "ADX__ClusterUrl",
+                          "value": "$(ADX_CLUSTER_URL)"
+                        },
+                        {
+                          "name": "ADX__Database",
+                          "value": "$(ADX_DATABASE)"
+                        },
+                        {
+                          "name": "AzureAd__TenantId",
+                          "value": "$(AZURE_AD_TENANT_ID)"
+                        },
+                        {
+                          "name": "AzureAd__ClientId",
+                          "value": "$(AZURE_AD_CLIENT_ID)"
+                        }
+                      ]

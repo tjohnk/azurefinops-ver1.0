@@ -1,0 +1,56 @@
+[
+  {
+    "resourceType": "Microsoft.Compute/virtualMachines",
+    "metricName": "Percentage CPU",
+    "aggregation": "Average",
+    "usageSignal": "cpu"
+  },
+  {
+    "resourceType": "Microsoft.Compute/virtualMachines",
+    "metricName": "Network In",
+    "aggregation": "Total",
+    "usageSignal": "network"
+  },
+  {
+    "resourceType": "Microsoft.Compute/virtualMachines",
+    "metricName": "Network Out",
+    "aggregation": "Total",
+    "usageSignal": "network"
+  },
+  {
+    "resourceType": "Microsoft.Storage/storageAccounts",
+    "metricName": "UsedCapacity",
+    "aggregation": "Average",
+    "usageSignal": "storage"
+  },
+  {
+    "resourceType": "Microsoft.Sql/servers/databases",
+    "metricName": "cpu_percent",
+    "aggregation": "Average",
+    "usageSignal": "cpu"
+  },
+  {
+    "resourceType": "Microsoft.Web/sites",
+    "metricName": "CpuTime",
+    "aggregation": "Total",
+    "usageSignal": "cpu"
+  },
+  {
+    "resourceType": "Microsoft.Web/sites",
+    "metricName": "RequestCount",
+    "aggregation": "Total",
+    "usageSignal": "requests"
+  },
+  {
+    "resourceType": "Microsoft.Web/sites",
+    "metricName": "Http5xx",
+    "aggregation": "Total",
+    "usageSignal": "failedRequests"
+  },
+  {
+    "resourceType": "Microsoft.Storage/storageAccounts",
+    "metricName": "Transactions",
+    "aggregation": "Total",
+    "usageSignal": "transactions"
+  }
+]

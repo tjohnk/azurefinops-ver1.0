@@ -1,0 +1,207 @@
+
+// ============================================================
+// COST ANALYSIS REPORT LIBRARY
+// Parameter convention: replace __ENV__ with "" or environment.
+// ============================================================
+
+// 1. Executive overview
+CostAnalysisFact
+| where Date >= startofday(ago(30d))
+| summarize CurrentMonth=sum(PreTaxCost),
+            Resources=dcount(ResourceId)
+| extend Period="Current Month";
+
+// 2. 30/60/90 day trend
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost=sum(PreTaxCost) by Date
+| order by Date asc;
+
+// 3. Cost by environment
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost90D=sum(PreTaxCost),
+            Resources=dcount(ResourceId)
+  by Environment
+| extend PercentOfTotal=100.0*Cost90D/sum(Cost90D) over ()
+| order by Cost90D desc;
+
+// 4. Cost by service
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost90D=sum(PreTaxCost),
+            Resources=dcount(ResourceId)
+  by ServiceName
+| order by Cost90D desc;
+
+// 5. Cost by resource
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost90D=sum(PreTaxCost)
+  by ResourceId,ResourceName,ServiceName,Environment,SubscriptionName
+| extend AnnualizedCost=Cost90D*4
+| top 100 by Cost90D desc;
+
+// 6. Cost by resource group
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost90D=sum(PreTaxCost)
+  by ResourceGroup,Environment
+| order by Cost90D desc;
+
+// 7. Cost by application
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost90D=sum(PreTaxCost)
+  by Application,Environment
+| order by Cost90D desc;
+
+// 8. Cost by business unit
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost90D=sum(PreTaxCost)
+  by BusinessUnit
+| order by Cost90D desc;
+
+// 9. Cost by owner
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost90D=sum(PreTaxCost),
+            Resources=dcount(ResourceId)
+  by Owner
+| order by Cost90D desc;
+
+// 10. Unallocated cost
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| extend AllocationIssue=case(
+    isempty(Application) or Application=="Unknown","Missing Application",
+    isempty(CostCenter) or CostCenter=="Unknown","Missing Cost Center",
+    isempty(Owner) or Owner=="Unknown","Missing Owner",
+    "Allocated")
+| summarize Cost90D=sum(PreTaxCost) by AllocationIssue
+| order by Cost90D desc;
+
+// 11. Cost by SKU
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost90D=sum(PreTaxCost),
+            Resources=dcount(ResourceId)
+  by ServiceName,SKU
+| order by Cost90D desc;
+
+// 12. Cost by region
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost90D=sum(PreTaxCost) by Region
+| order by Cost90D desc;
+
+// 13. Compute
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| where ServiceName in~ ("Virtual Machines","Azure Kubernetes Service","App Service",
+                         "Container Instances","Container Apps")
+| summarize Cost90D=sum(PreTaxCost) by ServiceName
+| order by Cost90D desc;
+
+// 14. Storage
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| where ServiceName contains "Storage"
+    or ServiceName contains "Disk"
+    or ServiceName contains "Backup"
+| summarize Cost90D=sum(PreTaxCost) by ServiceName
+| order by Cost90D desc;
+
+// 15. Networking
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| where ServiceName contains "Network"
+    or ServiceName contains "Firewall"
+    or ServiceName contains "Gateway"
+    or ServiceName contains "Private"
+    or ServiceName contains "VPN"
+| summarize Cost90D=sum(PreTaxCost) by ServiceName
+| order by Cost90D desc;
+
+// 16. Monitoring
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| where ServiceName contains "Monitor"
+    or ServiceName contains "Application Insights"
+    or ServiceName contains "Sentinel"
+    or MeterCategory contains "Log"
+| summarize Cost90D=sum(PreTaxCost) by ServiceName,MeterCategory
+| order by Cost90D desc;
+
+// 17. Environment x service
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost90D=sum(PreTaxCost) by Environment,ServiceName
+| order by Environment,Cost90D desc;
+
+// 18. Daily cost spikes
+CostAnalysisFact
+| where Date >= startofday(ago(30d))
+| summarize DailyCost=sum(PreTaxCost) by Date
+| serialize
+| extend PreviousDay=prev(DailyCost)
+| extend VariancePercent=iff(PreviousDay>0,100.0*(DailyCost-PreviousDay)/PreviousDay,0.0)
+| order by Date asc;
+
+// 19. Top cost increases by resource
+let c=CostAnalysisFact
+| where Date >= startofday(ago(60d))
+| summarize Cost=sum(PreTaxCost) by ResourceId,ResourceName,Environment,ServiceName,
+    Period=iff(Date >= startofday(ago(30d)),"Current","Previous");
+c
+| summarize Current=sumif(Cost,Period=="Current"),
+            Previous=sumif(Cost,Period=="Previous")
+  by ResourceId,ResourceName,Environment,ServiceName
+| extend Increase=Current-Previous,
+         IncreasePercent=iff(Previous>0,100.0*(Current-Previous)/Previous,100.0)
+| top 50 by Increase desc;
+
+// 20. Budget versus actual
+let actual=CostAnalysisFact
+| where Date between (startofday(ago(30d)) .. endofday(now()))
+| summarize Actual=sum(PreTaxCost) by Environment;
+CostBudgetFact
+| join kind=leftouter actual on Environment
+| extend Actual=coalesce(Actual,0.0),
+         Variance=Actual-BudgetAmount,
+         VariancePercent=iff(BudgetAmount>0,100.0*(Actual-BudgetAmount)/BudgetAmount,0.0),
+         BudgetUsedPercent=iff(BudgetAmount>0,100.0*Actual/BudgetAmount,0.0)
+| project Environment,BudgetName,BudgetAmount,Actual,Variance,VariancePercent,BudgetUsedPercent;
+
+// 21. Forecast
+CostForecastFact
+| where ForecastDate >= startofday(now())
+| summarize Forecast=sum(ForecastAmount),
+            Lower=sum(LowerBound),
+            Upper=sum(UpperBound)
+  by Environment
+| order by Environment;
+
+// 22. Anomalies
+CostAnomalyFact
+| where Status !in ("Closed","Rejected")
+| order by VariancePercent desc;
+
+// 23. Cost concentration
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost=sum(PreTaxCost) by ResourceId,ResourceName
+| top 20 by Cost desc;
+
+// 24. Cost with missing governance
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| extend Issue=case(
+    isempty(Application),"Missing Application",
+    isempty(BusinessUnit),"Missing Business Unit",
+    isempty(CostCenter),"Missing Cost Center",
+    isempty(Owner),"Missing Owner",
+    "Compliant")
+| summarize Cost90D=sum(PreTaxCost),Resources=dcount(ResourceId) by Issue
+| order by Cost90D desc;

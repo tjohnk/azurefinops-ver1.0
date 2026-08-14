@@ -1,0 +1,193 @@
+
+// USAGE & ACTIVITY REPORT LIBRARY
+
+// Overview
+ResourceUsageFact
+| summarize arg_max(TimestampUtc, *) by ResourceId
+| summarize TotalResources=dcount(ResourceId),
+            ActiveResources=dcountif(ResourceId,UsageStatus=="Active"),
+            InactiveResources=dcountif(ResourceId,UsageStatus=="Inactive"),
+            NeverUsedResources=dcountif(ResourceId,UsageStatus=="NeverUsed"),
+            ActivityEvents=sum(ActivityCount), Requests=sum(RequestCount),
+            FailedRequests=sum(FailedRequestCount)
+
+// Last activity
+ResourceUsageFact
+| summarize arg_max(TimestampUtc, *) by ResourceId
+| extend DaysSinceActivity=iff(isnull(LastActivityUtc),99999,
+    datetime_diff("day",now(),LastActivityUtc))
+| project ResourceId,ResourceName,ServiceName,Environment,Owner,
+          LastActivityUtc,DaysSinceActivity,UsageStatus,ActivityCount
+| order by DaysSinceActivity desc
+
+// Environment adoption
+ResourceUsageFact
+| summarize arg_max(TimestampUtc, *) by ResourceId
+| summarize Total=dcount(ResourceId),Active=dcountif(ResourceId,UsageStatus=="Active"),
+            Inactive=dcountif(ResourceId,UsageStatus=="Inactive"),
+            NeverUsed=dcountif(ResourceId,UsageStatus=="NeverUsed") by Environment
+| extend ActivePercent=iff(Total>0,100.0*Active/Total,0.0)
+
+// Service adoption
+ResourceUsageFact
+| summarize arg_max(TimestampUtc, *) by ResourceId
+| summarize Deployed=dcount(ResourceId),Active=dcountif(ResourceId,UsageStatus=="Active"),
+            Inactive=dcountif(ResourceId,UsageStatus in ("Inactive","NeverUsed")) by ServiceName
+| extend AdoptionPercent=iff(Deployed>0,100.0*Active/Deployed,0.0)
+| order by Deployed desc
+
+// Never used
+ResourceUsageFact
+| summarize arg_max(TimestampUtc, *) by ResourceId
+| where UsageStatus=="NeverUsed" or ActivityCount==0
+| project ResourceId,ResourceName,ServiceName,Environment,ResourceGroup,Owner,Application,
+          LastActivityUtc,UsageStatus
+
+// 90+ days inactive
+ResourceUsageFact
+| summarize arg_max(TimestampUtc, *) by ResourceId
+| extend DaysSinceActivity=iff(isnull(LastActivityUtc),99999,
+    datetime_diff("day",now(),LastActivityUtc))
+| where DaysSinceActivity>90
+| project ResourceId,ResourceName,ServiceName,Environment,Owner,DaysSinceActivity,UsageStatus
+
+// Trend
+ResourceUsageFact
+| where Date>=startofday(ago(90d))
+| summarize Activity=sum(ActivityCount),Requests=sum(RequestCount) by Date
+| order by Date asc
+
+// Activity by identity
+AzureActivityFact
+| where TimestampUtc>=ago(30d)
+| extend IdentityType=case(
+    CallerType in ("ServicePrincipal","ManagedIdentity"),CallerType,
+    isempty(Caller),"Unknown","Human")
+| summarize Operations=count(),Resources=dcount(ResourceId) by Caller,IdentityType
+| order by Operations desc
+
+// Human vs automation
+AzureActivityFact
+| where TimestampUtc>=ago(30d)
+| extend Source=case(
+    CallerType in ("ServicePrincipal","ManagedIdentity"),"Automation",
+    isempty(Caller),"Unknown","Human")
+| summarize Operations=count() by Source
+
+// Failed operations
+AzureActivityFact
+| where TimestampUtc>=ago(30d)
+| where ActivityStatus in ("Failed","Failure")
+| summarize Failures=count(),Resources=dcount(ResourceId) by OperationName,ResourceProvider
+| top 50 by Failures desc
+
+// Resource changes
+AzureActivityFact
+| where TimestampUtc>=ago(30d)
+| where OperationName has_any ("/write","/action","/update")
+| summarize Changes=count() by ResourceName,ResourceId,Environment,Caller
+| top 100 by Changes desc
+
+// Created/deleted
+AzureActivityFact
+| where TimestampUtc>=ago(30d)
+| extend Action=case(OperationName has "/delete","Deleted",
+                      OperationName has "/write","Created","Other")
+| where Action!="Other"
+| summarize Count=count() by bin(TimestampUtc,1d),Environment,Action
+| order by TimestampUtc asc
+
+// Start / stop
+AzureActivityFact
+| where TimestampUtc>=ago(30d)
+| extend Action=case(OperationName has "/start","Start",
+                      OperationName has "/stop","Stop",
+                      OperationName has "/deallocate","Deallocate",
+                      OperationName has "/restart","Restart","")
+| where Action!=""
+| summarize Count=count() by Action,Environment
+
+// Deployment activity
+DeploymentActivityFact
+| where TimestampUtc>=ago(30d)
+| summarize Deployments=count(),Successful=countif(Status=="Succeeded"),
+            Failed=countif(Status=="Failed") by Environment
+| extend SuccessPercent=iff(Deployments>0,100.0*Successful/Deployments,0.0)
+
+// VM utilization
+ResourceUsageFact
+| summarize arg_max(TimestampUtc, *) by ResourceId
+| where ResourceType =~ "microsoft.compute/virtualmachines"
+| project ResourceName,Environment,Owner,CPUPercent,MemoryPercent,NetworkBytes,
+          PowerState,LastActivityUtc,UsageStatus
+| order by CPUPercent asc
+
+// App Service usage
+ResourceUsageFact
+| summarize Requests=sum(RequestCount),FailedRequests=sum(FailedRequestCount),
+            CPUAvg=avg(CPUPercent),LastActivity=max(LastActivityUtc)
+  by ResourceId,ResourceName,Environment
+| where ResourceId has "/microsoft.web/sites/"
+| extend FailurePercent=iff(Requests>0,100.0*FailedRequests/Requests,0.0)
+| order by Requests asc
+
+// Storage usage
+ResourceUsageFact
+| summarize Transactions=sum(TransactionCount),NetworkBytes=sum(NetworkBytes),
+            LastActivity=max(LastActivityUtc)
+  by ResourceId,ResourceName,Environment
+| where ServiceName contains "Storage"
+| order by Transactions asc
+
+// SQL usage
+ResourceUsageFact
+| summarize Requests=sum(RequestCount),CPUAvg=avg(CPUPercent),
+            LastActivity=max(LastActivityUtc)
+  by ResourceId,ResourceName,Environment
+| where ServiceName contains "SQL"
+| order by Requests asc
+
+// Health
+ResourceHealthFact
+| summarize arg_max(TimestampUtc,*) by ResourceId
+| summarize Count=count() by HealthStatus,Environment
+
+// Activity heatmap
+AzureActivityFact
+| where TimestampUtc>=ago(30d)
+| extend DayOfWeek=format_datetime(TimestampUtc,"ddd"),
+         Hour=toint(format_datetime(TimestampUtc,"HH"))
+| summarize Events=count() by DayOfWeek,Hour
+
+// Environment x service
+ResourceUsageFact
+| summarize Activity=sum(ActivityCount),Requests=sum(RequestCount),
+            ActiveResources=dcountif(ResourceId,UsageStatus=="Active")
+  by Environment,ServiceName
+| order by Environment,Activity desc
+
+// Usage -> cost
+let u=ResourceUsageFact
+| where Date>=startofday(ago(90d))
+| summarize Activity=sum(ActivityCount),Requests=sum(RequestCount),
+            ActiveDays=dcountif(Date,ActivityCount>0)
+  by ResourceId,ResourceName,Environment;
+let c=CostAnalysisFact
+| where Date>=startofday(ago(90d))
+| summarize Cost90D=sum(PreTaxCost) by ResourceId;
+u | join kind=leftouter c on ResourceId
+| extend Cost90D=coalesce(Cost90D,0.0),
+         CostPerActivity=iff(Activity>0,Cost90D/Activity,0.0)
+| order by Cost90D desc
+
+// High cost + low usage
+let u=ResourceUsageFact
+| summarize Activity=sum(ActivityCount),ActiveDays=dcountif(Date,ActivityCount>0)
+  by ResourceId,ResourceName,Environment;
+let c=CostAnalysisFact
+| where Date>=startofday(ago(90d))
+| summarize Cost90D=sum(PreTaxCost) by ResourceId;
+u | join kind=inner c on ResourceId
+| where Cost90D>0 and (Activity<10 or ActiveDays<5)
+| extend AnnualizedCost=Cost90D*4
+| order by AnnualizedCost desc

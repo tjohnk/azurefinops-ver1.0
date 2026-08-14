@@ -1,0 +1,3 @@
+[
+  {"ResourceId":"/subscriptions/0000/resourceGroups/rg1/providers/Microsoft.Web/sites/app1","ResourceName":"app1","Environment":"Production","AnomalyScore":0.92,"Description":"Spike in daily cost","TimestampUtc":"2026-08-10T00:00:00Z"}
+]

@@ -1,0 +1,106 @@
+// Run after ResourceInventory and CostAnalysisFact are populated in ADX.
+// Intended to be executed by scripts/Invoke-OrphanDetection.ps1 (via `.set-or-append
+// OrphanResourceFact <|`), not run ad hoc — see that script for scheduling.
+//
+// Previously this rule only produced ResourceId/ResourceName/SubscriptionId/Environment/
+// ResourceGroup/Location/ResourceType/ServiceName/OrphanReason/Confidence/Cost90D/
+// AnnualizedCost — six columns short of what OrphansController.cs actually queries
+// (AgeDays, SnapshotDateUtc, Owner, Application, DependencyStatus, ReviewStatus), which
+// meant the "By Age" report and several columns of "Top Orphans" were always empty.
+// It also scanned every historical snapshot row as a candidate instead of just the
+// latest one per resource, so a resource present in 90 days of history would be
+// evaluated (and could show up) 90 times.
+
+// Latest snapshot per resource — candidates are evaluated against current state only.
+let Latest = ResourceInventory
+| summarize arg_max(snapshotDateUtc, *) by resourceId;
+
+// Earliest snapshot per resource — used as an AgeDays proxy. On a fresh ADX with no
+// history yet, every resource's first-seen date is "today", so AgeDays will read 0 for
+// everything until enough daily snapshots have accumulated — this is a known cold-start
+// limitation, not a bug (see GAP-ANALYSIS.md).
+let FirstSeen = ResourceInventory
+| summarize FirstSeenUtc=min(snapshotDateUtc) by resourceId;
+
+let Candidates = union
+(Latest
+| where resourceType =~ "microsoft.compute/disks"
+| extend state=tostring(properties.diskState)
+| where isempty(state) or state =~ "Unattached"
+| project ResourceId=resourceId,ResourceName=resourceName,SubscriptionId=subscriptionId,Environment=environment,
+ ResourceGroup=resourceGroup,Location=location,ResourceType=resourceType,ServiceName=serviceName,
+ OrphanReason="UNATTACHED_DISK",Confidence=98.0),
+(Latest
+| where resourceType =~ "microsoft.network/publicipaddresses"
+| extend cfg=tostring(properties.ipConfiguration.id)
+| where isempty(cfg)
+| project ResourceId=resourceId,ResourceName=resourceName,SubscriptionId=subscriptionId,Environment=environment,
+ ResourceGroup=resourceGroup,Location=location,ResourceType=resourceType,ServiceName=serviceName,
+ OrphanReason="UNASSOCIATED_PUBLIC_IP",Confidence=96.0),
+(Latest
+| where resourceType =~ "microsoft.network/networkinterfaces"
+| extend vm=tostring(properties.virtualMachine.id)
+| where isempty(vm)
+| project ResourceId=resourceId,ResourceName=resourceName,SubscriptionId=subscriptionId,Environment=environment,
+ ResourceGroup=resourceGroup,Location=location,ResourceType=resourceType,ServiceName=serviceName,
+ OrphanReason="UNATTACHED_NIC",Confidence=95.0),
+(Latest
+| where resourceType =~ "microsoft.web/serverfarms"
+| extend sites=toint(properties.numberOfSites)
+| where sites == 0
+| project ResourceId=resourceId,ResourceName=resourceName,SubscriptionId=subscriptionId,Environment=environment,
+ ResourceGroup=resourceGroup,Location=location,ResourceType=resourceType,ServiceName=serviceName,
+ OrphanReason="EMPTY_APP_SERVICE_PLAN",Confidence=90.0),
+(Latest
+| where resourceType =~ "microsoft.network/loadbalancers"
+| extend pools=array_length(properties.backendAddressPools)
+| where pools == 0
+| project ResourceId=resourceId,ResourceName=resourceName,SubscriptionId=subscriptionId,Environment=environment,
+ ResourceGroup=resourceGroup,Location=location,ResourceType=resourceType,ServiceName=serviceName,
+ OrphanReason="EMPTY_LOAD_BALANCER",Confidence=82.0),
+(Latest
+| where resourceType =~ "microsoft.network/applicationgateways"
+| extend pools=array_length(properties.backendAddressPools)
+| where pools == 0
+| project ResourceId=resourceId,ResourceName=resourceName,SubscriptionId=subscriptionId,Environment=environment,
+ ResourceGroup=resourceGroup,Location=location,ResourceType=resourceType,ServiceName=serviceName,
+ OrphanReason="EMPTY_APPLICATION_GATEWAY",Confidence=82.0),
+(Latest
+| where resourceType =~ "microsoft.network/natgateways"
+| extend subnets=array_length(properties.subnets)
+| where subnets == 0
+| project ResourceId=resourceId,ResourceName=resourceName,SubscriptionId=subscriptionId,Environment=environment,
+ ResourceGroup=resourceGroup,Location=location,ResourceType=resourceType,ServiceName=serviceName,
+ OrphanReason="UNASSOCIATED_NAT_GATEWAY",Confidence=88.0),
+(Latest
+| where resourceType =~ "microsoft.network/privateendpoints"
+| extend connections=array_length(properties.privateLinkServiceConnections)
+| where connections == 0
+| project ResourceId=resourceId,ResourceName=resourceName,SubscriptionId=subscriptionId,Environment=environment,
+ ResourceGroup=resourceGroup,Location=location,ResourceType=resourceType,ServiceName=serviceName,
+ OrphanReason="EMPTY_PRIVATE_ENDPOINT",Confidence=85.0);
+
+let Costs = CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost90D=sum(PreTaxCost) by ResourceId,SubscriptionId;
+
+// Owner/Application come from the tagging standard (finops/governance/TAGGING-STANDARD.md:
+// ApplicationOwner, Application) already captured on ResourceInventory.tags — no separate
+// collection needed, just wasn't being joined in before.
+let Tags = Latest
+| project resourceId, Owner=tostring(tags.ApplicationOwner), Application=tostring(tags.Application);
+
+Candidates
+| join kind=leftouter Costs on ResourceId,SubscriptionId
+| join kind=leftouter FirstSeen on $left.ResourceId == $right.resourceId
+| join kind=leftouter Tags on $left.ResourceId == $right.resourceId
+| extend Cost90D=coalesce(Cost90D,0.0),
+         AnnualizedCost=coalesce(Cost90D,0.0)*4,
+         AgeDays=datetime_diff('day', now(), FirstSeenUtc),
+         SnapshotDateUtc=now(),
+         DependencyStatus="NoDependenciesFound",
+         ReviewStatus="New"
+| project ResourceId,ResourceName,SubscriptionId,Environment,ResourceGroup,Location,ResourceType,ServiceName,
+          OrphanReason,Confidence,AgeDays,LastActivityUtc=datetime(null),Cost90D,AnnualizedCost,SnapshotDateUtc,
+          Owner,Application,BusinessUnit=tostring(""),CostCenter=tostring(""),DependencyStatus,ReviewStatus,
+          Recommendation=tostring(""),AdoWorkItemId=tostring(""),ValidatedSavings=real(null)

@@ -1,0 +1,38 @@
+[
+  {
+    "dateUtc": "2026-08-12T00:00:00.000Z",
+    "subscriptionId": "3f1a2b4c-1111-4a5b-9c6d-abcdef123456",
+    "subscriptionName": "sub-prod-01",
+    "resourceId": "/subscriptions/3f1a2b4c-1111-4a5b-9c6d-abcdef123456/resourceGroups/rg-prod-core/providers/Microsoft.Compute/virtualMachines/vm-prod-web-03",
+    "resourceName": "vm-prod-web-03",
+    "serviceName": "Virtual Machines",
+    "metricName": "Percentage CPU",
+    "usageSignal": "cpu",
+    "aggregation": "Average",
+    "value": 2.1
+  },
+  {
+    "dateUtc": "2026-08-12T00:00:00.000Z",
+    "subscriptionId": "3f1a2b4c-1111-4a5b-9c6d-abcdef123456",
+    "subscriptionName": "sub-prod-01",
+    "resourceId": "/subscriptions/3f1a2b4c-1111-4a5b-9c6d-abcdef123456/resourceGroups/rg-prod-core/providers/Microsoft.Web/sites/app-prod-checkout",
+    "resourceName": "app-prod-checkout",
+    "serviceName": "App Service",
+    "metricName": "RequestCount",
+    "usageSignal": "requests",
+    "aggregation": "Total",
+    "value": 88400
+  },
+  {
+    "dateUtc": "2026-08-12T00:00:00.000Z",
+    "subscriptionId": "3f1a2b4c-1111-4a5b-9c6d-abcdef123456",
+    "subscriptionName": "sub-prod-01",
+    "resourceId": "/subscriptions/3f1a2b4c-1111-4a5b-9c6d-abcdef123456/resourceGroups/rg-prod-core/providers/Microsoft.Web/sites/app-prod-checkout",
+    "resourceName": "app-prod-checkout",
+    "serviceName": "App Service",
+    "metricName": "Http5xx",
+    "usageSignal": "failedRequests",
+    "aggregation": "Total",
+    "value": 12
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "timeGeneratedUtc": "2026-08-12T14:22:10.000Z",
+    "subscriptionId": "3f1a2b4c-1111-4a5b-9c6d-abcdef123456",
+    "subscriptionName": "sub-prod-01",
+    "resourceId": "/subscriptions/3f1a2b4c-1111-4a5b-9c6d-abcdef123456/resourceGroups/rg-prod-core/providers/Microsoft.Web/sites/app-prod-checkout",
+    "resourceGroup": "rg-prod-core",
+    "resourceName": "app-prod-checkout",
+    "operationName": "Microsoft.Web/sites/write",
+    "activityStatus": "Succeeded",
+    "caller": "svc-deploy-pipeline@corp.com",
+    "category": "Administrative"
+  },
+  {
+    "timeGeneratedUtc": "2026-08-12T09:05:44.000Z",
+    "subscriptionId": "3f1a2b4c-1111-4a5b-9c6d-abcdef123456",
+    "subscriptionName": "sub-prod-01",
+    "resourceId": "/subscriptions/3f1a2b4c-1111-4a5b-9c6d-abcdef123456/resourceGroups/rg-prod-core/providers/Microsoft.Compute/virtualMachines/vm-prod-web-03",
+    "resourceGroup": "rg-prod-core",
+    "resourceName": "vm-prod-web-03",
+    "operationName": "Microsoft.Compute/virtualMachines/restart/action",
+    "activityStatus": "Succeeded",
+    "caller": "jane.doe@corp.com",
+    "category": "Administrative"
+  }
+]

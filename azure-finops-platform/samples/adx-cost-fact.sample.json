@@ -1,0 +1,26 @@
+[
+  {
+    "Date": "2026-08-12",
+    "SubscriptionId": "3f1a2b4c-1111-4a5b-9c6d-abcdef123456",
+    "SubscriptionName": "sub-prod-01",
+    "Environment": "Production",
+    "ResourceId": "/subscriptions/3f1a2b4c-1111-4a5b-9c6d-abcdef123456/resourceGroups/rg-prod-core/providers/Microsoft.Compute/virtualMachines/vm-prod-gpu-cluster",
+    "ResourceName": "vm-prod-gpu-cluster",
+    "ResourceGroup": "rg-prod-core",
+    "ServiceName": "Virtual Machines",
+    "ResourceType": "microsoft.compute/virtualmachines",
+    "Region": "eastus",
+    "SKU": "Standard_ND96asr_v4",
+    "MeterCategory": "Virtual Machines",
+    "MeterName": "ND96asr A100 v4",
+    "Quantity": 24.0,
+    "PreTaxCost": 41000.0,
+    "Currency": "INR",
+    "Application": "ML Training",
+    "BusinessUnit": "Engineering",
+    "CostCenter": "CC-1042",
+    "Owner": "jane.doe@corp.com",
+    "Project": "Recommendation Engine v2",
+    "Tags": { "Environment": "Production", "Application": "ML Training" }
+  }
+]

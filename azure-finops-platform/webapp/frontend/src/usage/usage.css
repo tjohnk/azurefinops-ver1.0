@@ -1,0 +1,13 @@
+
+.usage{min-height:100vh;background:#f4f7fb;padding:30px 42px;font-family:Inter,Arial;color:#172033}
+.usage header{max-width:1440px;margin:auto;display:flex;justify-content:space-between;align-items:center}.usage small{font-size:10px;color:#0b66c3;letter-spacing:1.5px}.usage h1{margin:4px 0;font-size:27px}.usage p{font-size:13px;color:#6b7483}
+.filters{display:flex;gap:10px}
+.usage select{padding:10px 14px;border:1px solid #d7dee8;border-radius:7px;background:#fff}.usage nav{max-width:1440px;margin:22px auto 18px;display:flex;gap:6px;overflow:auto}
+.usage nav button{white-space:nowrap;padding:9px 12px;border:1px solid #dfe5ec;background:#fff;border-radius:7px;font-size:11px;color:#657083}.usage nav button.on{background:#0b66c3;color:#fff}
+.kpis{max-width:1440px;margin:auto;display:grid;grid-template-columns:repeat(6,1fr);gap:12px}.kpis article,.panel{background:#fff;border:1px solid #e3e8ef;border-radius:10px;padding:18px;box-shadow:0 2px 8px #18274b0a}
+.kpis span{display:block;font-size:11px;color:#748093}.kpis b{display:block;font-size:24px;margin-top:8px}.grid{max-width:1440px;margin:18px auto;display:grid;grid-template-columns:2fr 1fr;gap:18px}.panel h3{font-size:14px;margin:0 0 16px}
+.item{display:flex;justify-content:space-between;padding:13px;border:1px solid #e9edf2;border-radius:8px;margin:8px 0;font-size:12px}.item span{color:#0b66c3;font-size:10px}
+.report{max-width:1440px;margin:auto;overflow:auto}.rh{display:flex;justify-content:space-between}.rh span{font-size:11px;color:#7b8492}
+.trend{overflow:visible}.trendChart{display:block;width:100%;height:180px;border:1px solid #e7ebf0;border-radius:8px;background:#fbfdff}.lineA{fill:none;stroke:#0b66c3;stroke-width:3}.lineQ{fill:none;stroke:#2fa36b;stroke-width:3}.trendX{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(40px,1fr);font-size:10px;color:#7b8492;margin:8px 0 14px}.trendX span{text-align:center;white-space:nowrap}.trendX .hide{visibility:hidden}
+table{width:100%;border-collapse:collapse;font-size:11px}th{font-size:9px;color:#748093;text-align:left;padding:10px;border-bottom:1px solid #e7ebf0}td{padding:11px;border-bottom:1px solid #eef1f5;white-space:nowrap}
+@media(max-width:1050px){.kpis{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}}@media(max-width:650px){.usage{padding:20px}.usage header{flex-direction:column;align-items:flex-start;gap:12px}.filters{width:100%}.kpis{grid-template-columns:repeat(2,1fr)}}

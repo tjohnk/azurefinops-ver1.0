@@ -1,0 +1,77 @@
+[
+  {
+    "name": "Cloud Spend",
+    "domain": "Inform",
+    "description": "Actual cloud cost for selected period"
+  },
+  {
+    "name": "Budget Variance",
+    "domain": "Inform",
+    "description": "Actual versus approved budget"
+  },
+  {
+    "name": "Forecast Variance",
+    "domain": "Inform",
+    "description": "Actual/forecast versus plan"
+  },
+  {
+    "name": "Allocated Cost %",
+    "domain": "Inform",
+    "description": "Spend mapped to business dimensions"
+  },
+  {
+    "name": "Anomaly Count",
+    "domain": "Inform",
+    "description": "Open cost/usage anomalies"
+  },
+  {
+    "name": "Potential Savings",
+    "domain": "Optimize",
+    "description": "Estimated opportunity value"
+  },
+  {
+    "name": "Realized Savings",
+    "domain": "Optimize",
+    "description": "Validated savings after remediation"
+  },
+  {
+    "name": "Reservation Coverage",
+    "domain": "Optimize",
+    "description": "Eligible compute covered by commitments"
+  },
+  {
+    "name": "Reservation Utilization",
+    "domain": "Optimize",
+    "description": "Utilization of purchased reservations"
+  },
+  {
+    "name": "Savings Plan Coverage",
+    "domain": "Optimize",
+    "description": "Eligible compute covered by savings plans"
+  },
+  {
+    "name": "Tag Compliance",
+    "domain": "Operate",
+    "description": "Resources meeting required tagging"
+  },
+  {
+    "name": "Owner Coverage",
+    "domain": "Operate",
+    "description": "Resources with valid owners"
+  },
+  {
+    "name": "Budget Compliance",
+    "domain": "Operate",
+    "description": "Scopes within approved budget"
+  },
+  {
+    "name": "Optimization Closure Rate",
+    "domain": "Operate",
+    "description": "Completed recommendations"
+  },
+  {
+    "name": "FinOps Maturity",
+    "domain": "Operate",
+    "description": "Maturity score across FinOps capabilities"
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "subscriptions": [
+    {
+      "subscriptionId": "87654321-4321-4321-4321-210987654321",
+      "subscriptionName": "Production",
+      "environment": "Production"
+    },
+    {
+      "subscriptionId": "11111111-2222-3333-4444-555555555555",
+      "subscriptionName": "Staging",
+      "environment": "Staging"
+    },
+    {
+      "subscriptionId": "66666666-7777-8888-9999-000000000000",
+      "subscriptionName": "Development",
+      "environment": "Development"
+    }
+  ]
+}

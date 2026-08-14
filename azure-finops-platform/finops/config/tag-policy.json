@@ -1,0 +1,20 @@
+{
+  "requiredTags": [
+    "Environment",
+    "Application",
+    "ApplicationOwner",
+    "TechnicalOwner",
+    "BusinessUnit",
+    "CostCenter",
+    "Project",
+    "Criticality"
+  ],
+  "recommendedTags": [
+    "DataClassification",
+    "ServiceTier",
+    "Lifecycle",
+    "ExpiryDate"
+  ],
+  "enforcementMode": "AuditFirstThenDeny",
+  "missingTagWorkflow": "CreateGovernanceWorkItem"
+}

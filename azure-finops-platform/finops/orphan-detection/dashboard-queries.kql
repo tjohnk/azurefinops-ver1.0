@@ -1,0 +1,23 @@
+
+// Summary
+OrphanResourceFact | summarize Total=count(),HighConfidence=countif(Confidence>=90),
+Production=countif(Environment=="Production"),Over90Days=countif(AgeDays>90),
+Cost90D=sum(Cost90D),PotentialAnnualSaving=sum(AnnualizedCost)
+
+// Environment
+OrphanResourceFact | summarize Orphans=count(),Cost90D=sum(Cost90D),
+PotentialSaving=sum(AnnualizedCost) by Environment
+
+// Type
+OrphanResourceFact | summarize Count=count(),Cost90D=sum(Cost90D),
+PotentialSaving=sum(AnnualizedCost) by ServiceName,OrphanReason
+| order by PotentialSaving desc
+
+// Age
+OrphanResourceFact | extend AgeBand=case(AgeDays<=30,"0-30",AgeDays<=60,"31-60",
+AgeDays<=90,"61-90",AgeDays<=180,"91-180","180+")
+| summarize Count=count(),Cost90D=sum(Cost90D) by AgeBand
+
+// Top candidates
+OrphanResourceFact | where ReviewStatus !in ("Closed","Rejected")
+| top 50 by AnnualizedCost desc

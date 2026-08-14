@@ -1,0 +1,52 @@
+[
+  {
+    "resourceType": "Microsoft.Compute/virtualMachines",
+    "serviceCategory": "Compute",
+    "serviceName": "Virtual Machines"
+  },
+  {
+    "resourceType": "Microsoft.Compute/disks",
+    "serviceCategory": "Compute",
+    "serviceName": "Managed Disks"
+  },
+  {
+    "resourceType": "Microsoft.Web/sites",
+    "serviceCategory": "Application",
+    "serviceName": "App Service"
+  },
+  {
+    "resourceType": "Microsoft.Web/serverfarms",
+    "serviceCategory": "Application",
+    "serviceName": "App Service Plan"
+  },
+  {
+    "resourceType": "Microsoft.Storage/storageAccounts",
+    "serviceCategory": "Storage",
+    "serviceName": "Storage Accounts"
+  },
+  {
+    "resourceType": "Microsoft.Sql/servers/databases",
+    "serviceCategory": "Database",
+    "serviceName": "Azure SQL Database"
+  },
+  {
+    "resourceType": "Microsoft.KeyVault/vaults",
+    "serviceCategory": "Security",
+    "serviceName": "Key Vault"
+  },
+  {
+    "resourceType": "Microsoft.Network/virtualNetworks",
+    "serviceCategory": "Networking",
+    "serviceName": "Virtual Network"
+  },
+  {
+    "resourceType": "Microsoft.Network/publicIPAddresses",
+    "serviceCategory": "Networking",
+    "serviceName": "Public IP"
+  },
+  {
+    "resourceType": "Microsoft.Network/privateEndpoints",
+    "serviceCategory": "Networking",
+    "serviceName": "Private Endpoint"
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "TimestampUtc": "2026-08-12T14:22:10.000Z",
+    "SubscriptionId": "3f1a2b4c-1111-4a5b-9c6d-abcdef123456",
+    "SubscriptionName": "sub-prod-01",
+    "Environment": "Production",
+    "ResourceId": "/subscriptions/3f1a2b4c-1111-4a5b-9c6d-abcdef123456/resourceGroups/rg-prod-core/providers/Microsoft.Web/sites/app-prod-checkout",
+    "ResourceGroup": "rg-prod-core",
+    "ResourceProvider": "Microsoft.Web",
+    "OperationName": "Microsoft.Web/sites/write",
+    "ActivityStatus": "Succeeded",
+    "Caller": "svc-deploy-pipeline@corp.com",
+    "CallerType": "Human",
+    "CorrelationId": "",
+    "ResourceName": "app-prod-checkout",
+    "Region": "eastus"
+  },
+  {
+    "TimestampUtc": "2026-08-12T09:05:44.000Z",
+    "SubscriptionId": "3f1a2b4c-1111-4a5b-9c6d-abcdef123456",
+    "SubscriptionName": "sub-prod-01",
+    "Environment": "Production",
+    "ResourceId": "/subscriptions/3f1a2b4c-1111-4a5b-9c6d-abcdef123456/resourceGroups/rg-prod-core/providers/Microsoft.Compute/virtualMachines/vm-prod-web-03",
+    "ResourceGroup": "rg-prod-core",
+    "ResourceProvider": "Microsoft.Compute",
+    "OperationName": "Microsoft.Compute/virtualMachines/restart/action",
+    "ActivityStatus": "Succeeded",
+    "Caller": "jane.doe@corp.com",
+    "CallerType": "Human",
+    "CorrelationId": "",
+    "ResourceName": "vm-prod-web-03",
+    "Region": "eastus"
+  }
+]

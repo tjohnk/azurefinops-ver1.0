@@ -1,0 +1,59 @@
+// Executive FinOps scorecard
+let periodStart = startofday(ago(30d));
+let spend = CostAnalysisFact
+| where Date >= periodStart
+| summarize Spend=sum(PreTaxCost) by Environment;
+let opt = FinOpsOptimizationFact
+| summarize PotentialSavings=sum(EstimatedSavings), RealizedSavings=sum(ValidatedSavings)
+  by Environment;
+spend
+| join kind=fullouter opt on Environment
+| project Environment, Spend=coalesce(Spend,0.0),
+          PotentialSavings=coalesce(PotentialSavings,0.0),
+          RealizedSavings=coalesce(RealizedSavings,0.0);
+
+// Cost by allocation dimensions
+CostAnalysisFact
+| where Date >= startofday(ago(90d))
+| summarize Cost=sum(PreTaxCost)
+  by Environment, Application, BusinessUnit, CostCenter, Owner, ServiceName
+| order by Cost desc;
+
+// Budget versus actual
+let actual = CostAnalysisFact
+| summarize Actual=sum(PreTaxCost) by Environment;
+CostBudgetFact
+| join kind=leftouter actual on Environment
+| extend Variance=Actual-BudgetAmount,
+         VariancePercent=100.0*(Actual-BudgetAmount)/BudgetAmount
+| project Environment,BudgetAmount,Actual,Variance,VariancePercent;
+
+// Open anomalies
+CostAnomalyFact
+| where Status !in ("Closed","Rejected")
+| order by Severity desc, VariancePercent desc;
+
+// Optimization pipeline
+FinOpsOptimizationFact
+| summarize Opportunities=count(),
+            PotentialSavings=sum(EstimatedSavings),
+            RealizedSavings=sum(ValidatedSavings)
+  by State, RecommendationType, Environment;
+
+// Governance
+FinOpsGovernanceFact
+| summarize Resources=count(),
+            Compliant=countif(TagCompliancePercent >= 100),
+            Owners=countif(OwnerPresent),
+            PolicyIssues=countif(PolicyState !in ("Compliant","NotApplicable"))
+  by Environment
+| extend TagCompliancePercent=100.0*Compliant/Resources,
+         OwnerCoveragePercent=100.0*Owners/Resources;
+
+// Commitment coverage
+FinOpsCommitmentFact
+| summarize EligibleSpend=sum(EligibleSpend),
+            CoveredSpend=sum(CoveredSpend),
+            PotentialSavings=sum(PotentialSavings)
+  by Environment, CommitmentType
+| extend CoveragePercent=100.0*CoveredSpend/EligibleSpend;

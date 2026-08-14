@@ -1,0 +1,4 @@
+[
+  {"ResourceId":"/subscriptions/0000/resourceGroups/rg1/providers/Microsoft.Compute/virtualMachines/vm1","ResourceName":"vm1","Environment":"Dev","Cost90D":12.34,"DailyCost":0.14,"Currency":"USD","TimestampUtc":"2026-08-14T00:00:00Z","AnnualizedCost":49.36},
+  {"ResourceId":"/subscriptions/0000/resourceGroups/rg1/providers/Microsoft.Web/sites/app1","ResourceName":"app1","Environment":"Production","Cost90D":123.45,"DailyCost":1.37,"Currency":"USD","TimestampUtc":"2026-08-14T00:00:00Z","AnnualizedCost":493.8}
+]

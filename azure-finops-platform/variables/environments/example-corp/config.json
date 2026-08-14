@@ -1,0 +1,47 @@
+{
+  "tenantId": "12345678-1234-1234-1234-123456789012",
+  "tenantName": "ExampleCorp",
+  "storage": {
+    "accountName": "examplecorpassessment",
+    "resourceGroup": "rg-finops-prod",
+    "subscription": "87654321-4321-4321-4321-210987654321",
+    "rawContainer": "raw",
+    "curatedContainer": "curated"
+  },
+  "adx": {
+    "clusterUrl": "https://exampleadx.eastus.kusto.windows.net",
+    "clusterName": "exampleadx",
+    "resourceGroup": "rg-finops-prod",
+    "database": "AzureAdoption",
+    "region": "eastus",
+    "useManagedIdentity": true
+  },
+  "webapp": {
+    "name": "examplecorp-finops-api",
+    "resourceGroup": "rg-finops-prod",
+    "clientId": "11111111-1111-1111-1111-111111111111",
+    "instance": "https://login.microsoftonline.com/",
+    "skuTier": "PremiumV3",
+    "skuSize": "P1v3",
+    "minTlsVersion": "1.2",
+    "httpsOnly": true,
+    "alwaysOn": true
+  },
+  "pipeline": {
+    "azureServiceConnection": "sc-azure-adoption-wif",
+    "vmImage": "windows-latest",
+    "collectSchedule": {
+      "frequency": "hourly",
+      "cron": "0 * * * *"
+    }
+  },
+  "devops": {
+    "organization": "examplecorp",
+    "project": "AzureFinOps"
+  },
+  "collection": {
+    "modes": ["Baseline", "Hourly", "Daily", "Weekly"],
+    "defaultMode": "Daily",
+    "defaultDays": 90
+  }
+}

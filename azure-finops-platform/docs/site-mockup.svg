@@ -1,0 +1,290 @@
+<svg width="1440" height="1024" viewBox="0 0 1440 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="720" y1="0" x2="720" y2="1024" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A121D"/>
+      <stop offset="1" stop-color="#0D1623"/>
+    </linearGradient>
+    <linearGradient id="sidebarGrad" x1="137" y1="10" x2="137" y2="1014" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#101A27" stop-opacity="0.96"/>
+      <stop offset="1" stop-color="#0B141F" stop-opacity="0.98"/>
+    </linearGradient>
+    <linearGradient id="panelGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#141F2E" stop-opacity="0.98"/>
+      <stop offset="1" stop-color="#111B29" stop-opacity="0.98"/>
+    </linearGradient>
+    <linearGradient id="logoGrad" x1="39" y1="22" x2="39" y2="70" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#50B8FF"/>
+      <stop offset="1" stop-color="#1D6EFF"/>
+    </linearGradient>
+    <linearGradient id="blueBar" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#4A7FF3"/>
+      <stop offset="1" stop-color="#3B68C7"/>
+    </linearGradient>
+    <linearGradient id="greenBar" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#76B950"/>
+      <stop offset="1" stop-color="#5D9A37"/>
+    </linearGradient>
+    <linearGradient id="redBar" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#E05A52"/>
+      <stop offset="1" stop-color="#C7443E"/>
+    </linearGradient>
+    <linearGradient id="amberBar" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#F0B43B"/>
+      <stop offset="1" stop-color="#D59216"/>
+    </linearGradient>
+    <linearGradient id="blueVBar" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#5789FF"/>
+      <stop offset="1" stop-color="#3E69D5"/>
+    </linearGradient>
+    <linearGradient id="greenVBar" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#7CB750"/>
+      <stop offset="1" stop-color="#5F9638"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1440" height="1024" fill="url(#bg)"/>
+
+  <rect x="10" y="10" width="274" height="1004" rx="14" fill="url(#sidebarGrad)" stroke="#27364B"/>
+  <rect x="24" y="24" width="48" height="48" rx="10" fill="url(#logoGrad)"/>
+  <text x="40" y="57" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700">A</text>
+  <text x="84" y="40" fill="#F4F7FB" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700">Azure Adoption &amp; Usage Assessment</text>
+  <text x="84" y="60" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600">Overview Dashboard</text>
+  <text x="84" y="82" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="11">Last Refresh: 18-May-2025 08:30 AM</text>
+  <line x1="24" y1="96" x2="260" y2="96" stroke="rgba(255,255,255,0.08)"/>
+
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="13">
+    <rect x="24" y="118" width="236" height="38" rx="8" fill="url(#blueVBar)"/>
+    <text x="42" y="142" fill="#FFFFFF">•</text><text x="60" y="142" fill="#FFFFFF">Overview</text>
+
+    <text x="42" y="187" fill="#DDE5F0">•</text><text x="60" y="187" fill="#DDE5F0">Resources</text>
+    <text x="42" y="224" fill="#DDE5F0">•</text><text x="60" y="224" fill="#DDE5F0">Usage &amp; Activity</text>
+    <text x="42" y="261" fill="#DDE5F0">•</text><text x="60" y="261" fill="#DDE5F0">Cost Analysis</text>
+    <text x="42" y="298" fill="#DDE5F0">•</text><text x="60" y="298" fill="#DDE5F0">Recommendations</text>
+    <text x="42" y="335" fill="#DDE5F0">•</text><text x="60" y="335" fill="#DDE5F0">Service Adoption</text>
+    <text x="42" y="372" fill="#DDE5F0">•</text><text x="60" y="372" fill="#DDE5F0">Environment Comparison</text>
+    <text x="42" y="409" fill="#DDE5F0">•</text><text x="60" y="409" fill="#DDE5F0">Orphaned Resources</text>
+    <text x="42" y="446" fill="#DDE5F0">•</text><text x="60" y="446" fill="#DDE5F0">Reports</text>
+    <text x="42" y="483" fill="#DDE5F0">•</text><text x="60" y="483" fill="#DDE5F0">Data Dictionary</text>
+  </g>
+
+  <g transform="translate(298,10)">
+    <text x="0" y="18" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600">Environment</text>
+    <rect x="0" y="26" width="278" height="48" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+    <rect x="6" y="30" width="50" height="40" rx="7" fill="#3C75EA"/>
+    <rect x="60" y="30" width="64" height="40" rx="7" fill="#507B34"/>
+    <rect x="128" y="30" width="46" height="40" rx="7" fill="#365CB1"/>
+    <rect x="178" y="30" width="64" height="40" rx="7" fill="#CC8F26"/>
+    <rect x="246" y="30" width="26" height="40" rx="7" fill="#C54A38"/>
+    <text x="20" y="55" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="13">All</text>
+    <text x="70" y="55" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="13">Sandbox</text>
+    <text x="143" y="55" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="13">Dev</text>
+    <text x="189" y="55" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="13">Staging</text>
+    <text x="252" y="55" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="11">Prod</text>
+
+    <text x="300" y="18" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600">Subscription</text>
+    <rect x="300" y="26" width="96" height="48" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+    <text x="316" y="55" fill="#E5EBF4" font-family="Segoe UI, Arial, sans-serif" font-size="13">All</text>
+    <text x="376" y="55" fill="#E5EBF4" font-family="Segoe UI, Arial, sans-serif" font-size="13">⌄</text>
+
+    <text x="412" y="18" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600">Resource Group</text>
+    <rect x="412" y="26" width="110" height="48" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+    <text x="428" y="55" fill="#E5EBF4" font-family="Segoe UI, Arial, sans-serif" font-size="13">All</text>
+    <text x="501" y="55" fill="#E5EBF4" font-family="Segoe UI, Arial, sans-serif" font-size="13">⌄</text>
+
+    <text x="538" y="18" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600">Resource Type</text>
+    <rect x="538" y="26" width="110" height="48" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+    <text x="554" y="55" fill="#E5EBF4" font-family="Segoe UI, Arial, sans-serif" font-size="13">All</text>
+    <text x="627" y="55" fill="#E5EBF4" font-family="Segoe UI, Arial, sans-serif" font-size="13">⌄</text>
+
+    <text x="664" y="18" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600">Date Range (Usage)</text>
+    <rect x="664" y="26" width="162" height="48" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+    <text x="680" y="55" fill="#E5EBF4" font-family="Segoe UI, Arial, sans-serif" font-size="13">🗓</text>
+    <text x="705" y="55" fill="#E5EBF4" font-family="Segoe UI, Arial, sans-serif" font-size="13">Last 90 Days</text>
+    <text x="804" y="55" fill="#E5EBF4" font-family="Segoe UI, Arial, sans-serif" font-size="13">⌄</text>
+  </g>
+
+  <g transform="translate(298,96)">
+    <g>
+      <rect x="0" y="0" width="184" height="90" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+      <text x="18" y="24" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12">Total Resources</text>
+      <text x="18" y="56" fill="#67A9FF" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700">7,842</text>
+      <text x="18" y="76" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="11">All Environments</text>
+    </g>
+    <g>
+      <rect x="196" y="0" width="184" height="90" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+      <text x="214" y="24" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12">Active Resources</text>
+      <text x="214" y="56" fill="#72CB5F" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700">5,392</text>
+      <text x="214" y="76" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="11">68.76% of Total</text>
+    </g>
+    <g>
+      <rect x="392" y="0" width="184" height="90" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+      <text x="410" y="24" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12">Low Usage Resources</text>
+      <text x="410" y="56" fill="#F0AF2E" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700">1,367</text>
+      <text x="410" y="76" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="11">17.43% of Total</text>
+    </g>
+    <g>
+      <rect x="588" y="0" width="184" height="90" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+      <text x="606" y="24" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12">No Usage Resources</text>
+      <text x="606" y="56" fill="#FF655A" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700">683</text>
+      <text x="606" y="76" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="11">8.72% of Total</text>
+    </g>
+    <g>
+      <rect x="784" y="0" width="184" height="90" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+      <text x="802" y="24" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12">Orphaned Resources</text>
+      <text x="802" y="56" fill="#BE73F6" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700">400</text>
+      <text x="802" y="76" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="11">5.10% of Total</text>
+    </g>
+    <g>
+      <rect x="980" y="0" width="152" height="90" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+      <text x="998" y="24" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12">Total Monthly Cost</text>
+      <text x="998" y="56" fill="#65C7FF" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">₹ 18.76M</text>
+      <text x="998" y="76" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="11">All Environments</text>
+    </g>
+  </g>
+
+  <g transform="translate(298,198)">
+    <rect x="0" y="0" width="372" height="250" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+    <rect x="384" y="0" width="372" height="250" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+    <rect x="768" y="0" width="364" height="250" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+
+    <text x="14" y="24" fill="#F3F7FC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">Resources by Environment</text>
+    <circle cx="120" cy="125" r="72" fill="#182434"/>
+    <path d="M120 53 A72 72 0 0 1 188 100" stroke="#D84D45" stroke-width="24" fill="none"/>
+    <path d="M188 100 A72 72 0 0 1 143 193" stroke="#E3A42A" stroke-width="24" fill="none"/>
+    <path d="M143 193 A72 72 0 0 1 51 145" stroke="#3F7CFF" stroke-width="24" fill="none"/>
+    <path d="M51 145 A72 72 0 0 1 120 53" stroke="#74B64F" stroke-width="24" fill="none"/>
+    <circle cx="120" cy="125" r="42" fill="#121C2A"/>
+    <text x="94" y="121" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">7,842</text>
+    <text x="104" y="142" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="12">Total</text>
+    <circle cx="228" cy="86" r="5" fill="#D84D45"/><text x="240" y="90" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="13">Production</text><text x="316" y="90" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="12">3,125 (39.86%)</text>
+    <circle cx="228" cy="116" r="5" fill="#E3A42A"/><text x="240" y="120" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="13">Staging</text><text x="300" y="120" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="12">1,843 (23.51%)</text>
+    <circle cx="228" cy="146" r="5" fill="#3F7CFF"/><text x="240" y="150" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="13">Dev</text><text x="280" y="150" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="12">1,672 (21.33%)</text>
+    <circle cx="228" cy="176" r="5" fill="#74B64F"/><text x="240" y="180" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="13">Sandbox</text><text x="302" y="180" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="12">1,202 (15.31%)</text>
+
+    <text x="398" y="24" fill="#F3F7FC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">Resources by Status</text>
+    <circle cx="504" cy="125" r="72" fill="#182434"/>
+    <path d="M504 53 A72 72 0 1 1 442 164" stroke="#74B64F" stroke-width="24" fill="none"/>
+    <path d="M442 164 A72 72 0 0 1 437 97" stroke="#E3A42A" stroke-width="24" fill="none"/>
+    <path d="M437 97 A72 72 0 0 1 468 64" stroke="#D84D45" stroke-width="24" fill="none"/>
+    <path d="M468 64 A72 72 0 0 1 504 53" stroke="#A05AD7" stroke-width="24" fill="none"/>
+    <circle cx="504" cy="125" r="42" fill="#121C2A"/>
+    <text x="478" y="121" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">7,842</text>
+    <text x="488" y="142" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="12">Total</text>
+    <circle cx="612" cy="86" r="5" fill="#74B64F"/><text x="624" y="90" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="13">Active</text><text x="673" y="90" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="12">5,392 (68.76%)</text>
+    <circle cx="612" cy="116" r="5" fill="#E3A42A"/><text x="624" y="120" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="13">Low Usage</text><text x="699" y="120" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="12">1,367 (17.43%)</text>
+    <circle cx="612" cy="146" r="5" fill="#D84D45"/><text x="624" y="150" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="13">No Usage</text><text x="695" y="150" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="12">683 (8.72%)</text>
+    <circle cx="612" cy="176" r="5" fill="#A05AD7"/><text x="624" y="180" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="13">Orphaned</text><text x="690" y="180" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="12">400 (5.10%)</text>
+
+    <text x="782" y="24" fill="#F3F7FC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">Monthly Cost by Environment (₹)</text>
+    <text x="786" y="64" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="11">8M</text>
+    <text x="786" y="104" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="11">6M</text>
+    <text x="786" y="144" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="11">4M</text>
+    <text x="786" y="184" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="11">2M</text>
+    <text x="786" y="224" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="11">0M</text>
+    <line x1="820" y1="214" x2="1112" y2="214" stroke="rgba(255,255,255,0.08)"/>
+    <rect x="840" y="70" width="56" height="144" rx="6" fill="url(#redBar)"/>
+    <rect x="930" y="140" width="56" height="74" rx="6" fill="url(#amberBar)"/>
+    <rect x="1020" y="154" width="56" height="60" rx="6" fill="url(#blueVBar)"/>
+    <rect x="1088" y="168" width="56" height="46" rx="6" fill="url(#greenVBar)"/>
+    <text x="832" y="60" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="11">₹ 8.45M</text>
+    <text x="924" y="130" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="11">₹ 4.32M</text>
+    <text x="1012" y="144" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="11">₹ 3.43M</text>
+    <text x="1080" y="158" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="11">₹ 2.56M</text>
+    <text x="846" y="232" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12">Production</text>
+    <text x="942" y="232" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12">Staging</text>
+    <text x="1037" y="232" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12">Dev</text>
+    <text x="1094" y="232" fill="#D6DEEA" font-family="Segoe UI, Arial, sans-serif" font-size="12">Sandbox</text>
+  </g>
+
+  <g transform="translate(298,462)">
+    <rect x="0" y="0" width="372" height="232" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+    <rect x="384" y="0" width="372" height="232" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+    <rect x="768" y="0" width="364" height="232" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+
+    <text x="14" y="24" fill="#F3F7FC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">Top 10 Services by Resource Count</text>
+    <g font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#D6DEEA">
+      <text x="14" y="52">Microsoft.Compute</text><rect x="130" y="44" width="142" height="10" rx="3" fill="url(#blueBar)"/><text x="280" y="52">1,386</text>
+      <text x="14" y="72">Microsoft.Storage</text><rect x="130" y="64" width="116" height="10" rx="3" fill="url(#blueBar)"/><text x="254" y="72">1,124</text>
+      <text x="14" y="92">Microsoft.Web</text><rect x="130" y="84" width="90" height="10" rx="3" fill="url(#blueBar)"/><text x="228" y="92">874</text>
+      <text x="14" y="112">Microsoft.Sql</text><rect x="130" y="104" width="76" height="10" rx="3" fill="url(#blueBar)"/><text x="214" y="112">742</text>
+      <text x="14" y="132">Microsoft.Network</text><rect x="130" y="124" width="65" height="10" rx="3" fill="url(#blueBar)"/><text x="203" y="132">640</text>
+      <text x="14" y="152">Microsoft.ContainerService</text><rect x="130" y="144" width="49" height="10" rx="3" fill="url(#blueBar)"/><text x="187" y="152">478</text>
+      <text x="14" y="172">Microsoft.KeyVault</text><rect x="130" y="164" width="34" height="10" rx="3" fill="url(#blueBar)"/><text x="172" y="172">332</text>
+      <text x="14" y="192">Microsoft.DBforPostgreSQL</text><rect x="130" y="184" width="30" height="10" rx="3" fill="url(#blueBar)"/><text x="168" y="192">298</text>
+      <text x="14" y="212">Microsoft.AppServiceEnvironment</text><rect x="130" y="204" width="19" height="10" rx="3" fill="url(#blueBar)"/><text x="157" y="212">186</text>
+    </g>
+
+    <text x="398" y="24" fill="#F3F7FC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">Service Adoption (% Active Resources)</text>
+    <g font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#D6DEEA">
+      <text x="398" y="52">App Service</text><rect x="515" y="44" width="165" height="10" rx="3" fill="url(#greenBar)"/><text x="688" y="52">92.3%</text>
+      <text x="398" y="72">Storage Accounts</text><rect x="515" y="64" width="160" height="10" rx="3" fill="url(#greenBar)"/><text x="683" y="72">89.7%</text>
+      <text x="398" y="92">Azure SQL Database</text><rect x="515" y="84" width="154" height="10" rx="3" fill="url(#greenBar)"/><text x="677" y="92">86.1%</text>
+      <text x="398" y="112">Virtual Machines</text><rect x="515" y="104" width="151" height="10" rx="3" fill="url(#greenBar)"/><text x="674" y="112">84.5%</text>
+      <text x="398" y="132">Key Vault</text><rect x="515" y="124" width="140" height="10" rx="3" fill="url(#greenBar)"/><text x="663" y="132">78.4%</text>
+      <text x="398" y="152">Azure Functions</text><rect x="515" y="144" width="136" height="10" rx="3" fill="url(#greenBar)"/><text x="659" y="152">76.2%</text>
+      <text x="398" y="172">AKS (Kubernetes)</text><rect x="515" y="164" width="131" height="10" rx="3" fill="url(#greenBar)"/><text x="654" y="172">73.6%</text>
+      <text x="398" y="192">Load Balancers</text><rect x="515" y="184" width="129" height="10" rx="3" fill="url(#greenBar)"/><text x="652" y="192">72.8%</text>
+      <text x="398" y="212">App Service Environment</text><rect x="515" y="204" width="116" height="10" rx="3" fill="url(#greenBar)"/><text x="639" y="212">65.4%</text>
+    </g>
+
+    <text x="782" y="24" fill="#F3F7FC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">Resources by Location (Top 10)</text>
+    <rect x="782" y="40" width="334" height="128" rx="10" fill="#111B29" stroke="rgba(255,255,255,0.04)"/>
+    <ellipse cx="850" cy="87" rx="44" ry="18" fill="rgba(137,157,185,0.16)"/>
+    <ellipse cx="934" cy="78" rx="48" ry="20" fill="rgba(137,157,185,0.16)"/>
+    <ellipse cx="1030" cy="98" rx="58" ry="24" fill="rgba(137,157,185,0.16)"/>
+    <ellipse cx="1086" cy="140" rx="22" ry="12" fill="rgba(137,157,185,0.16)"/>
+    <circle cx="834" cy="82" r="6" fill="#60AFFF"/><circle cx="946" cy="70" r="5" fill="#60AFFF"/><circle cx="1048" cy="104" r="7" fill="#60AFFF"/><circle cx="1018" cy="92" r="5" fill="#60AFFF"/><circle cx="1088" cy="138" r="5" fill="#60AFFF"/>
+    <g font-family="Segoe UI, Arial, sans-serif" font-size="11">
+      <rect x="782" y="180" width="62" height="40" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)"/>
+      <text x="790" y="196" fill="#9FB0C7">East US</text><text x="790" y="212" fill="#EFF5FF">2,450</text>
+      <rect x="850" y="180" width="72" height="40" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)"/>
+      <text x="858" y="196" fill="#9FB0C7">West Europe</text><text x="858" y="212" fill="#EFF5FF">1,245</text>
+      <rect x="928" y="180" width="82" height="40" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)"/>
+      <text x="936" y="196" fill="#9FB0C7">Southeast Asia</text><text x="936" y="212" fill="#EFF5FF">986</text>
+      <rect x="1016" y="180" width="76" height="40" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)"/>
+      <text x="1024" y="196" fill="#9FB0C7">Central India</text><text x="1024" y="212" fill="#EFF5FF">742</text>
+      <rect x="1098" y="180" width="82" height="40" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)"/>
+      <text x="1106" y="196" fill="#9FB0C7">Australia East</text><text x="1106" y="212" fill="#EFF5FF">615</text>
+    </g>
+  </g>
+
+  <g transform="translate(298,708)">
+    <rect x="0" y="0" width="372" height="250" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+    <rect x="384" y="0" width="372" height="250" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+    <rect x="768" y="0" width="364" height="250" rx="10" fill="url(#panelGrad)" stroke="#27364B"/>
+
+    <text x="14" y="24" fill="#F3F7FC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">Top 10 Unused Resources (No Activity in Last 90 Days)</text>
+    <g font-family="Segoe UI, Arial, sans-serif" font-size="10">
+      <text x="14" y="50" fill="#9FB0C7">Resource Name</text><text x="108" y="50" fill="#9FB0C7">Type</text><text x="174" y="50" fill="#9FB0C7">Env</text><text x="214" y="50" fill="#9FB0C7">Resource Group</text><text x="312" y="50" fill="#9FB0C7">Monthly Cost</text>
+      <text x="14" y="74" fill="#E5ECF6">vm-sbx-test-01</text><text x="108" y="74" fill="#E5ECF6">Virtual Machine</text><text x="174" y="74" fill="#E5ECF6">Sandbox</text><text x="214" y="74" fill="#E5ECF6">rg-sbx-test</text><text x="312" y="74" fill="#E5ECF6">12,450</text>
+      <text x="14" y="96" fill="#E5ECF6">app-dev-oldapi</text><text x="108" y="96" fill="#E5ECF6">App Service</text><text x="174" y="96" fill="#E5ECF6">Dev</text><text x="214" y="96" fill="#E5ECF6">rg-dev-apps</text><text x="312" y="96" fill="#E5ECF6">8,750</text>
+      <text x="14" y="118" fill="#E5ECF6">sql-stg-unused</text><text x="108" y="118" fill="#E5ECF6">SQL Database</text><text x="174" y="118" fill="#E5ECF6">Staging</text><text x="214" y="118" fill="#E5ECF6">rg-stg-data</text><text x="312" y="118" fill="#E5ECF6">6,230</text>
+      <text x="14" y="140" fill="#E5ECF6">stacc-dev-backup</text><text x="108" y="140" fill="#E5ECF6">Storage</text><text x="174" y="140" fill="#E5ECF6">Dev</text><text x="214" y="140" fill="#E5ECF6">rg-dev-storage</text><text x="312" y="140" fill="#E5ECF6">4,120</text>
+      <text x="14" y="228" fill="#9FB0C7">* Cost data is based on amortized costs and may not reflect real-time charges.</text>
+    </g>
+
+    <text x="398" y="24" fill="#F3F7FC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">Resources by Recommendation</text>
+    <g font-family="Segoe UI, Arial, sans-serif" font-size="11">
+      <text x="398" y="50" fill="#9FB0C7">Recommendation</text><text x="566" y="50" fill="#9FB0C7">Resources</text><text x="650" y="50" fill="#9FB0C7">Potential Savings (₹)</text>
+      <text x="398" y="78" fill="#E5ECF6">Right-size</text><text x="566" y="78" fill="#E5ECF6">1,245</text><text x="650" y="78" fill="#E5ECF6">3,45,000</text>
+      <text x="398" y="102" fill="#E5ECF6">Shutdown (Schedule)</text><text x="566" y="102" fill="#E5ECF6">982</text><text x="650" y="102" fill="#E5ECF6">2,76,000</text>
+      <text x="398" y="126" fill="#E5ECF6">Delete</text><text x="566" y="126" fill="#E5ECF6">683</text><text x="650" y="126" fill="#E5ECF6">1,92,000</text>
+      <text x="398" y="150" fill="#E5ECF6">Move to Lower Tier</text><text x="566" y="150" fill="#E5ECF6">421</text><text x="650" y="150" fill="#E5ECF6">1,15,000</text>
+      <text x="398" y="174" fill="#E5ECF6">Reserved Instances</text><text x="566" y="174" fill="#E5ECF6">312</text><text x="650" y="174" fill="#E5ECF6">2,35,000</text>
+      <text x="398" y="208" fill="#E5ECF6" font-weight="700">Total</text><text x="566" y="208" fill="#E5ECF6" font-weight="700">3,643</text><text x="650" y="208" fill="#E5ECF6" font-weight="700">11,63,000</text>
+    </g>
+
+    <text x="782" y="24" fill="#F3F7FC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">Environment Comparison</text>
+    <g font-family="Segoe UI, Arial, sans-serif" font-size="10">
+      <text x="782" y="50" fill="#9FB0C7">Metric</text><text x="882" y="50" fill="#9FB0C7">Sandbox</text><text x="944" y="50" fill="#9FB0C7">Dev</text><text x="992" y="50" fill="#9FB0C7">Staging</text><text x="1054" y="50" fill="#9FB0C7">Production</text><text x="1136" y="50" fill="#9FB0C7">Total</text>
+      <text x="782" y="76" fill="#E5ECF6">Total Resources</text><text x="882" y="76" fill="#E5ECF6">1,202</text><text x="944" y="76" fill="#E5ECF6">1,672</text><text x="992" y="76" fill="#E5ECF6">1,843</text><text x="1054" y="76" fill="#E5ECF6">3,125</text><text x="1136" y="76" fill="#E5ECF6">7,842</text>
+      <text x="782" y="100" fill="#E5ECF6">Active Resources</text><text x="882" y="100" fill="#E5ECF6">652</text><text x="944" y="100" fill="#E5ECF6">1,152</text><text x="992" y="100" fill="#E5ECF6">1,387</text><text x="1054" y="100" fill="#E5ECF6">2,201</text><text x="1136" y="100" fill="#E5ECF6">5,392</text>
+      <text x="782" y="124" fill="#E5ECF6">Low Usage Resources</text><text x="882" y="124" fill="#E5ECF6">247</text><text x="944" y="124" fill="#E5ECF6">311</text><text x="992" y="124" fill="#E5ECF6">362</text><text x="1054" y="124" fill="#E5ECF6">447</text><text x="1136" y="124" fill="#E5ECF6">1,367</text>
+      <text x="782" y="148" fill="#E5ECF6">No Usage Resources</text><text x="882" y="148" fill="#E5ECF6">173</text><text x="944" y="148" fill="#E5ECF6">128</text><text x="992" y="148" fill="#E5ECF6">142</text><text x="1054" y="148" fill="#E5ECF6">240</text><text x="1136" y="148" fill="#E5ECF6">683</text>
+      <text x="782" y="172" fill="#E5ECF6">Orphaned Resources</text><text x="882" y="172" fill="#E5ECF6">130</text><text x="944" y="172" fill="#E5ECF6">81</text><text x="992" y="172" fill="#E5ECF6">87</text><text x="1054" y="172" fill="#E5ECF6">102</text><text x="1136" y="172" fill="#E5ECF6">400</text>
+      <text x="782" y="196" fill="#E5ECF6">Monthly Cost (₹)</text><text x="882" y="196" fill="#E5ECF6">2.56M</text><text x="944" y="196" fill="#E5ECF6">3.43M</text><text x="992" y="196" fill="#E5ECF6">4.32M</text><text x="1054" y="196" fill="#E5ECF6">8.45M</text><text x="1136" y="196" fill="#E5ECF6">18.76M</text>
+    </g>
+  </g>
+
+  <text x="1376" y="1002" text-anchor="end" fill="#9FB0C7" font-family="Segoe UI, Arial, sans-serif" font-size="12">All dates and times are in UTC</text>
+</svg>

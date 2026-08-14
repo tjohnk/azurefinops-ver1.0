@@ -1,0 +1,26 @@
+[
+  {
+    "SnapshotDate": "2026-08-13",
+    "Environment": "Production",
+    "SubscriptionId": "3f1a2b4c-1111-4a5b-9c6d-abcdef123456",
+    "ResourceId": "/subscriptions/3f1a2b4c-1111-4a5b-9c6d-abcdef123456/resourceGroups/rg-prod-core/providers/Microsoft.Compute/virtualMachines/vm-prod-web-03",
+    "ResourceName": "vm-prod-web-03",
+    "MissingRequiredTags": 3,
+    "TagCompliancePercent": 62.5,
+    "OwnerPresent": true,
+    "PolicyState": "NotEvaluated",
+    "BudgetState": "NotEvaluated"
+  },
+  {
+    "SnapshotDate": "2026-08-13",
+    "Environment": "Sandbox",
+    "SubscriptionId": "7c2d3e5f-2222-4b6c-8d7e-fedcba654321",
+    "ResourceId": "/subscriptions/7c2d3e5f-2222-4b6c-8d7e-fedcba654321/resourceGroups/rg-sbx-test/providers/Microsoft.Compute/disks/disk-sbx-orphan-14",
+    "ResourceName": "disk-sbx-orphan-14",
+    "MissingRequiredTags": 8,
+    "TagCompliancePercent": 0.0,
+    "OwnerPresent": false,
+    "PolicyState": "NotEvaluated",
+    "BudgetState": "NotEvaluated"
+  }
+]

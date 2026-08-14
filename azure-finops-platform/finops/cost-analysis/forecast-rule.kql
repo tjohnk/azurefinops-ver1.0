@@ -1,0 +1,37 @@
+// Run by scripts/Collect-CostForecast.ps1 against ADX (via `.set-or-append CostForecastFact <|`).
+//
+// Before this existed, CostForecastFact had a schema and CostAnalysisController had a
+// /forecast endpoint querying it, but nothing populated it — FORECAST-RUNBOOK.md described
+// the intended methodology as a manual process only.
+//
+// Methodology (deliberately simple and auditable, matching FORECAST-RUNBOOK.md steps 1 and
+// 4 — "aggregate historical daily cost by scope" and "produce forecast plus confidence
+// bounds"): compare the last 15 days' average daily cost to the prior 15 days' average to
+// get a daily growth rate, then project 30 days forward. This is a linear trend, not a
+// seasonal or event-aware model — runbook steps 2 ("remove/flag known one-time events") and
+// 3 ("account for committed future workloads") are NOT implemented; they need human
+// judgment about what counts as a one-time event, which isn't something to infer silently.
+// Model is recorded as "SimpleLinearTrend30D" in every row precisely so this is visible in
+// the data, not just in this comment.
+
+let recentDaily = CostAnalysisFact
+| where Date >= startofday(ago(15d))
+| where Currency =~ "USD"
+| summarize DailyCost=sum(PreTaxCost) by Date, Environment
+| summarize RecentAvg=avg(DailyCost), RecentStdev=stdev(DailyCost) by Environment;
+let priorDaily = CostAnalysisFact
+| where Date >= startofday(ago(30d)) and Date < startofday(ago(15d))
+| where Currency =~ "USD"
+| summarize DailyCost=sum(PreTaxCost) by Date, Environment
+| summarize PriorAvg=avg(DailyCost) by Environment;
+recentDaily
+| join kind=leftouter priorDaily on Environment
+| extend PriorAvg=coalesce(PriorAvg, RecentAvg), RecentStdev=coalesce(RecentStdev, 0.0)
+| extend DailyGrowth = iff(PriorAvg > 0, (RecentAvg - PriorAvg) / 15.0, 0.0)
+| extend ProjectedDailyAvg = RecentAvg + DailyGrowth * 30
+| extend ForecastAmount = ProjectedDailyAvg * 30
+| extend LowerBound = max_of(0.0, ForecastAmount - RecentStdev * 30)
+| extend UpperBound = ForecastAmount + RecentStdev * 30
+| extend ForecastDate = startofday(now() + 30d), ScopeId = Environment, ScopeType = "Environment",
+         Currency = "USD", Model = "SimpleLinearTrend30D"
+| project ForecastDate, ScopeId, ScopeType, Environment, ForecastAmount, LowerBound, UpperBound, Currency, Model

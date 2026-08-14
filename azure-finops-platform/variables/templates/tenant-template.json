@@ -1,0 +1,47 @@
+{
+  "tenantId": "<REPLACE-TENANT-ID>",
+  "tenantName": "MyOrganization",
+  "storage": {
+    "accountName": "<REPLACE-ASSESSMENT-STORAGE>",
+    "resourceGroup": "<REPLACE-RG-NAME>",
+    "subscription": "<REPLACE-SUBSCRIPTION-ID>",
+    "rawContainer": "raw",
+    "curatedContainer": "curated"
+  },
+  "adx": {
+    "clusterUrl": "https://<REPLACE-ADX-CLUSTER>.<REGION>.kusto.windows.net",
+    "clusterName": "<REPLACE-ADX-CLUSTER>",
+    "resourceGroup": "<REPLACE-ADX-RG-NAME>",
+    "database": "AzureAdoption",
+    "region": "<REGION>",
+    "useManagedIdentity": true
+  },
+  "webapp": {
+    "name": "<REPLACE-APP-NAME>",
+    "resourceGroup": "<REPLACE-WEBAPP-RG-NAME>",
+    "clientId": "<REPLACE-WEB-APP-CLIENT-ID>",
+    "instance": "https://login.microsoftonline.com/",
+    "skuTier": "PremiumV3",
+    "skuSize": "P1v3",
+    "minTlsVersion": "1.2",
+    "httpsOnly": true,
+    "alwaysOn": true
+  },
+  "pipeline": {
+    "azureServiceConnection": "sc-azure-adoption-wif",
+    "vmImage": "windows-latest",
+    "collectSchedule": {
+      "frequency": "hourly",
+      "cron": "0 * * * *"
+    }
+  },
+  "devops": {
+    "organization": "<REPLACE-ADO-ORG>",
+    "project": "<REPLACE-ADO-PROJECT>"
+  },
+  "collection": {
+    "modes": ["Baseline", "Hourly", "Daily", "Weekly"],
+    "defaultMode": "Daily",
+    "defaultDays": 90
+  }
+}

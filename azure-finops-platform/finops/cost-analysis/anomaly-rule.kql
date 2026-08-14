@@ -1,0 +1,35 @@
+// Run by scripts/Detect-CostAnomalies.ps1 against ADX (via `.set-or-append CostAnomalyFact <|`).
+//
+// Before this existed, CostAnomalyFact had a schema and both CostAnalysisController and
+// FinOpsController had endpoints querying it, but nothing populated it.
+//
+// Methodology (matches ANOMALY-RUNBOOK.md step 1, "detect anomaly using cost/usage
+// baseline", and step 2, "classify severity"): baseline is each resource's average daily
+// cost over the 30 days ending a week ago (excluding the most recent week so a real,
+// still-ongoing spike isn't diluted into its own baseline); compare that to the average of
+// the most recent 7 days. Only variances of 40% or more are flagged, to avoid noise from
+// normal day-to-day fluctuation. Severity bands (High/Medium/Low) are a simple variance
+// threshold, not a statistical confidence measure — good enough to triage, not to cite as
+// a p-value. Runbook steps 3 onward (compare against deployment/activity changes, root
+// cause, remediation) are intentionally NOT automated here — they need a human to
+// investigate and are represented by the Status/Owner/RootCause columns staying empty
+// until someone works the anomaly (see ANOMALY-RUNBOOK.md for that workflow).
+
+let baseline = CostAnalysisFact
+| where Date >= startofday(ago(37d)) and Date < startofday(ago(7d))
+| where Currency =~ "USD"
+| summarize BaselineAvg=avg(PreTaxCost), BaselineStdev=stdev(PreTaxCost)
+  by ResourceId, ResourceName, ServiceName, Environment, SubscriptionId;
+let recent = CostAnalysisFact
+| where Date >= startofday(ago(7d))
+| where Currency =~ "USD"
+| summarize ActualCost=avg(PreTaxCost) by ResourceId;
+baseline
+| join kind=inner recent on ResourceId
+| extend VariancePercent = iff(BaselineAvg > 0, round(100.0 * (ActualCost - BaselineAvg) / BaselineAvg, 1), 0.0)
+| where abs(VariancePercent) >= 40
+| extend Severity = case(abs(VariancePercent) >= 150, "High", abs(VariancePercent) >= 75, "Medium", "Low"),
+         AnomalyId = strcat(ResourceId, "-", format_datetime(now(), "yyyyMMdd")),
+         DetectedUtc = now(), Status = "Open", Owner = tostring(""), RootCause = tostring("")
+| project AnomalyId, DetectedUtc, Environment, SubscriptionId, ResourceId, ResourceName, ServiceName,
+          BaselineCost=BaselineAvg, ActualCost, VariancePercent, Severity, Status, Owner, RootCause

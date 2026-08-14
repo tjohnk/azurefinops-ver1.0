@@ -1,0 +1,4 @@
+[
+  {"ResourceId":"/subscriptions/0000/resourceGroups/rg1/providers/Microsoft.Compute/virtualMachines/vm1","ResourceName":"vm1","Type":"Virtual Machine","Environment":"Dev","UsageStatus":"Inactive","ActivityCount":0,"CPUPercent":12.5,"RequestCount":0,"FailedRequestCount":0,"TransactionCount":0,"NetworkBytes":0,"LastActivityUtc":"2026-05-17T00:00:00Z","TimestampUtc":"2026-08-14T00:00:00Z"},
+  {"ResourceId":"/subscriptions/0000/resourceGroups/rg1/providers/Microsoft.Web/sites/app1","ResourceName":"app1","Type":"App Service","Environment":"Production","UsageStatus":"Active","ActivityCount":1200,"CPUPercent":null,"RequestCount":1200,"FailedRequestCount":3,"TransactionCount":0,"NetworkBytes":0,"LastActivityUtc":"2026-08-14T00:00:00Z","TimestampUtc":"2026-08-14T00:00:00Z"}
+]

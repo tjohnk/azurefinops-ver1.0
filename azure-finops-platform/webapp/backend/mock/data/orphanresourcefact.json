@@ -1,0 +1,20 @@
+[
+  {
+    "ResourceId":"/subscriptions/0000/resourceGroups/rg1/providers/Microsoft.Compute/virtualMachines/vm1",
+    "ResourceName":"vm1",
+    "ServiceName":"Virtual Machine",
+    "Environment":"Dev",
+    "AgeDays":120,
+    "Cost90D":12.34,
+    "AnnualizedCost":49.36,
+    "Confidence":95,
+    "OrphanReason":"Unattached Disk",
+    "DependencyStatus":"None",
+    "Owner":"owner@example.com",
+    "Application":"App1",
+    "Recommendation":"Delete",
+    "AdoWorkItemId":null,
+    "SnapshotDateUtc":"2026-08-14T00:00:00Z",
+    "ReviewStatus":"Open"
+  }
+]

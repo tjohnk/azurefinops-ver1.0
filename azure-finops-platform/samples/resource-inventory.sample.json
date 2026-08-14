@@ -1,0 +1,44 @@
+[
+  {
+    "snapshotDateUtc": "2026-08-13T02:00:00.000Z",
+    "subscriptionId": "3f1a2b4c-1111-4a5b-9c6d-abcdef123456",
+    "subscriptionName": "sub-prod-01",
+    "resourceId": "/subscriptions/3f1a2b4c-1111-4a5b-9c6d-abcdef123456/resourceGroups/rg-prod-core/providers/Microsoft.Compute/virtualMachines/vm-prod-web-03",
+    "resourceName": "vm-prod-web-03",
+    "resourceGroup": "rg-prod-core",
+    "resourceType": "microsoft.compute/virtualmachines",
+    "location": "eastus",
+    "kind": null,
+    "managedBy": null,
+    "tags": {
+      "Environment": "Production",
+      "Application": "Customer Portal",
+      "ApplicationOwner": "jane.doe@corp.com",
+      "BusinessUnit": "Engineering",
+      "CostCenter": "CC-1042"
+    },
+    "environment": "Production",
+    "usageStatus": "NO_USAGE",
+    "activityCount": 0,
+    "orphanedReason": null,
+    "isOrphaned": false
+  },
+  {
+    "snapshotDateUtc": "2026-08-13T02:00:00.000Z",
+    "subscriptionId": "7c2d3e5f-2222-4b6c-8d7e-fedcba654321",
+    "subscriptionName": "sub-sandbox-01",
+    "resourceId": "/subscriptions/7c2d3e5f-2222-4b6c-8d7e-fedcba654321/resourceGroups/rg-sbx-test/providers/Microsoft.Compute/disks/disk-sbx-orphan-14",
+    "resourceName": "disk-sbx-orphan-14",
+    "resourceGroup": "rg-sbx-test",
+    "resourceType": "microsoft.compute/disks",
+    "location": "eastus",
+    "kind": null,
+    "managedBy": null,
+    "tags": {},
+    "environment": "Sandbox",
+    "usageStatus": "NO_USAGE",
+    "activityCount": 0,
+    "orphanedReason": "No activity and no usage in the selected time window",
+    "isOrphaned": true
+  }
+]

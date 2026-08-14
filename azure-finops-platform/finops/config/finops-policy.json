@@ -1,0 +1,43 @@
+{
+  "version": "1.0",
+  "currency": "INR",
+  "allocationDimensions": [
+    "Environment",
+    "Subscription",
+    "ResourceGroup",
+    "Application",
+    "BusinessUnit",
+    "CostCenter",
+    "Owner",
+    "Project",
+    "Service"
+  ],
+  "environments": [
+    "Sandbox",
+    "Dev",
+    "Staging",
+    "Production"
+  ],
+  "usageLookbackDays": 90,
+  "forecastHorizonDays": 90,
+  "anomalyLookbackDays": 30,
+  "thresholds": {
+    "noUsageDays": 60,
+    "lowUtilizationPercent": 10,
+    "budgetWarningPercent": 80,
+    "budgetCriticalPercent": 100,
+    "anomalyPercent": 20,
+    "tagComplianceTargetPercent": 95,
+    "ownerCoverageTargetPercent": 98
+  },
+  "optimizationStates": [
+    "New",
+    "Triaged",
+    "Accepted",
+    "Rejected",
+    "InProgress",
+    "Implemented",
+    "Validated",
+    "Closed"
+  ]
+}

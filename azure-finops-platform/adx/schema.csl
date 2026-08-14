@@ -1,0 +1,162 @@
+// =============================================================================
+// Azure Estate FinOps Intelligence Platform — Canonical ADX Schema
+// =============================================================================
+// This is the SINGLE source of truth for all ADX tables used by the platform.
+// It replaces and consolidates what were previously four overlapping schema
+// files (adx/no-csv-schema.csl, finops/kql/finops-schema.csl,
+// finops/cost-analysis/cost-schema.csl, finops/usage-activity/usage-schema.csl)
+// that had grown independently and defined duplicate tables for the same
+// concepts under different names. See /GAP-ANALYSIS.md for what was merged.
+//
+// Naming convention: PascalCase tables, PascalCase columns, PascalCase status
+// string values (e.g. "Active", not "ACTIVE"). Every fact table carries
+// Environment and SubscriptionId so every API/UI filter works uniformly.
+// =============================================================================
+
+// ---------- Estate inventory ----------
+
+.create table ResourceInventory (
+    snapshotDateUtc:datetime, environment:string, subscriptionId:string, subscriptionName:string,
+    resourceId:string, resourceName:string, resourceGroup:string, resourceType:string,
+    serviceCategory:string, serviceName:string, location:string, kind:string, managedBy:string, tags:dynamic
+)
+
+.create table ResourceMetrics (
+    dateUtc:datetime, environment:string, subscriptionId:string, resourceId:string, resourceName:string,
+    serviceName:string, metricName:string, usageSignal:string, aggregation:string, value:real
+)
+
+.create table CollectorHealth (
+    RunId:string, RunStartUtc:datetime, RunEndUtc:datetime, Mode:string, Environment:string,
+    Status:string, ResourcesCollected:long, MetricRows:long, ActivityRows:long, Errors:long
+)
+
+// ---------- Usage & Activity module ----------
+// UsageStatus values: Active | LowUsage | Inactive | NeverUsed
+// (LowUsage sits between Active and Inactive — see finops/usage-activity/STATUS-RULES.md)
+
+.create table ResourceUsageFact (
+    Date:date, TimestampUtc:datetime, SubscriptionId:string, SubscriptionName:string,
+    Environment:string, ResourceId:string, ResourceName:string, ResourceGroup:string,
+    ResourceType:string, ServiceName:string, Region:string, Owner:string,
+    Application:string, BusinessUnit:string, CostCenter:string, ActivityCount:long,
+    RequestCount:long, FailedRequestCount:long, InvocationCount:long,
+    CPUPercent:real, MemoryPercent:real, NetworkBytes:long, TransactionCount:long,
+    LastActivityUtc:datetime, PowerState:string, UsageStatus:string, ActivitySource:string
+)
+
+.create table AzureActivityFact (
+    TimestampUtc:datetime, SubscriptionId:string, SubscriptionName:string, Environment:string,
+    ResourceId:string, ResourceGroup:string, ResourceProvider:string, OperationName:string,
+    ActivityStatus:string, Caller:string, CallerType:string, CorrelationId:string,
+    ResourceName:string, Region:string
+)
+
+.create table DeploymentActivityFact (
+    TimestampUtc:datetime, Environment:string, SubscriptionId:string, ResourceId:string,
+    ResourceName:string, PipelineId:string, PipelineName:string, RunId:string,
+    Repository:string, Branch:string, RequestedBy:string, Status:string, DurationSeconds:long
+)
+
+.create table ResourceHealthFact (
+    TimestampUtc:datetime, SubscriptionId:string, Environment:string, ResourceId:string,
+    ResourceName:string, HealthStatus:string, AvailabilityState:string, Reason:string
+)
+
+// ---------- Cost Analysis module ----------
+// Canonical cost/budget/forecast/anomaly tables. These replace the earlier
+// FinOpsCostFact / FinOpsBudgetFact / FinOpsForecastFact / FinOpsAnomalyFact
+// and the master pack's CostFact — all four were the same concept, defined
+// twice or three times independently. This version is kept because it is the
+// most complete (adds SKU, Region, Tags).
+
+.create table CostAnalysisFact (
+    Date:date, SubscriptionId:string, SubscriptionName:string, Environment:string,
+    ResourceId:string, ResourceName:string, ResourceGroup:string, ServiceName:string,
+    ResourceType:string, Region:string, SKU:string, MeterCategory:string, MeterName:string,
+    Quantity:real, PreTaxCost:real, Currency:string, Application:string, BusinessUnit:string,
+    CostCenter:string, Owner:string, Project:string, Tags:dynamic
+)
+
+.create table CostBudgetFact (
+    ScopeId:string, ScopeType:string, Environment:string, BudgetName:string,
+    PeriodStart:date, PeriodEnd:date, BudgetAmount:real, Currency:string,
+    WarningPercent:real, CriticalPercent:real
+)
+
+.create table CostForecastFact (
+    ForecastDate:date, ScopeId:string, ScopeType:string, Environment:string,
+    ForecastAmount:real, LowerBound:real, UpperBound:real, Currency:string, Model:string
+)
+
+.create table CostAnomalyFact (
+    AnomalyId:string, DetectedUtc:datetime, Environment:string, SubscriptionId:string,
+    ResourceId:string, ResourceName:string, ServiceName:string, BaselineCost:real,
+    ActualCost:real, VariancePercent:real, Severity:string, Status:string, Owner:string,
+    RootCause:string
+)
+
+// ---------- FinOps framework facts (unique — no overlap with Cost Analysis module) ----------
+
+.create table FinOpsAllocationFact (
+    Date:date, CostRecordId:string, Environment:string, SubscriptionId:string, ResourceId:string,
+    Application:string, BusinessUnit:string, CostCenter:string, Owner:string,
+    AllocationMethod:string, AllocatedCost:real, SharedCost:real
+)
+
+.create table FinOpsOptimizationFact (
+    RecommendationId:string, CreatedUtc:datetime, Environment:string, SubscriptionId:string,
+    ResourceId:string, ServiceName:string, RecommendationType:string, CurrentCost:real,
+    EstimatedSavings:real, Currency:string, Priority:string, Owner:string, State:string,
+    DueDate:date, ValidatedSavings:real
+)
+
+.create table FinOpsCommitmentFact (
+    Date:date, Environment:string, SubscriptionId:string, CommitmentType:string,
+    CommitmentId:string, Scope:string, EligibleSpend:real, CoveredSpend:real,
+    UtilizationPercent:real, CoveragePercent:real, PotentialSavings:real, Currency:string
+)
+
+.create table FinOpsGovernanceFact (
+    SnapshotDate:date, Environment:string, SubscriptionId:string, ResourceId:string,
+    ResourceName:string, MissingRequiredTags:int, TagCompliancePercent:real,
+    OwnerPresent:bool, PolicyState:string, BudgetState:string
+)
+
+.create table FinOpsMaturityFact (
+    AssessmentDate:date, Capability:string, Domain:string, Score:real, TargetScore:real,
+    Evidence:string, Owner:string, NextAction:string
+)
+
+.create table FinOpsWorkItemFact (
+    WorkItemId:string, CreatedUtc:datetime, SourceType:string, SourceId:string,
+    Environment:string, ResourceId:string, Recommendation:string, Owner:string, State:string,
+    DueDate:date, EstimatedSavings:real, ValidatedSavings:real
+)
+
+// ---------- Orphaned Resources module (net-new, no overlap) ----------
+
+.create table OrphanResourceFact (
+    SnapshotDateUtc:datetime, ResourceId:string, ResourceName:string, SubscriptionId:string,
+    Environment:string, ResourceGroup:string, Location:string, ResourceType:string, ServiceName:string,
+    OrphanReason:string, Confidence:real, AgeDays:long, LastActivityUtc:datetime, Cost90D:real,
+    AnnualizedCost:real, Owner:string, Application:string, BusinessUnit:string, CostCenter:string,
+    DependencyStatus:string, ReviewStatus:string, Recommendation:string, AdoWorkItemId:string,
+    ValidatedSavings:real
+)
+
+// =============================================================================
+// Deprecated / removed in this consolidation — kept here as a record only.
+// Do NOT re-create these tables; they are replaced by the tables above.
+//   CostFact              -> use CostAnalysisFact
+//   FinOpsCostFact         -> use CostAnalysisFact
+//   FinOpsBudgetFact       -> use CostBudgetFact
+//   FinOpsForecastFact     -> use CostForecastFact
+//   FinOpsAnomalyFact      -> use CostAnomalyFact
+//   ActivityLog            -> use AzureActivityFact
+//   ResourceAdoptionMaster -> was referenced by OverviewController but never
+//                             defined anywhere in the source packages. Overview
+//                             is now computed directly from ResourceUsageFact
+//                             joined with OrphanResourceFact — see
+//                             webapp/backend/Controllers/OverviewController.cs
+// =============================================================================
